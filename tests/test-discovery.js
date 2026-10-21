@@ -53,6 +53,9 @@ export function run(t) {
     const noUevent = buildDevice({ cardNode: 'card1', vendorHexText: '0x1002', ueventText: null });
     eq(noUevent.stableId, 'pci-card1', 'falls back to cardN when no PCI slot');
 
+    const emptySlot = buildDevice({ cardNode: 'card1', vendorHexText: '0x1002', ueventText: 'PCI_SLOT_NAME=\n' });
+    eq(emptySlot.stableId, 'pci-card1', 'falls back to cardN when PCI slot empty');
+
     // discover with injected io
     const devices = discover({
         listDir: () => ['card1', 'card1-DP-1', 'renderD128', 'version'],

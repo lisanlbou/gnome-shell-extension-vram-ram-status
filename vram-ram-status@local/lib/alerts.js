@@ -36,8 +36,10 @@ export function classifyPercent(percent, warning, critical) {
  * Evaluate one metric against its thresholds and previous state.
  *
  * Returns { level, transitioned, notify, state } where `state` is the value to
- * persist for the next poll ({ level, lastNotifyAt }). Notifications fire only
- * on a transition into warning/critical and are gated by the cooldown.
+ * persist for the next poll ({ level, lastNotifyAt }). The computed `level` is
+ * independent of `enabled`, so callers can render warning/critical colors even
+ * when notifications are turned off. Notifications fire only when `enabled` is
+ * true, on a transition into warning/critical, and outside the cooldown.
  * Unknown/stale readings (non-finite percent) suppress alerts entirely.
  */
 export function evaluateAlert(percent, options, prevState) {
@@ -45,6 +47,7 @@ export function evaluateAlert(percent, options, prevState) {
     const critical = options.critical;
     const hysteresis = options.hysteresis;
     const cooldown = options.cooldown;
+    const enabled = options.enabled !== false;
     const now = Number.isFinite(options.now) ? options.now : Date.now();
     const prev = prevState || { level: Level.NONE, lastNotifyAt: null };
 
@@ -72,7 +75,7 @@ export function evaluateAlert(percent, options, prevState) {
     const transitioned = level !== prev.level;
     const cooldownOk =
         prev.lastNotifyAt === null || now - prev.lastNotifyAt >= cooldown * 1000;
-    const notify = level !== Level.NONE && transitioned && cooldownOk;
+    const notify = enabled && level !== Level.NONE && transitioned && cooldownOk;
 
     return {
         level,

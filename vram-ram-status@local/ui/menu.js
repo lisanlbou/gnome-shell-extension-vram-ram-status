@@ -19,6 +19,7 @@ import { ProgressBar } from './progressBar.js';
 const MEMORY_CLASS_LABELS = Object.freeze({
     [MemoryClass.SYSTEM]: 'system',
     [MemoryClass.DEDICATED]: 'dedicated',
+    [MemoryClass.VISIBLE]: 'visible',
     [MemoryClass.SHARED]: 'shared',
     [MemoryClass.LOCAL]: 'local',
     [MemoryClass.UNKNOWN]: 'unknown',
@@ -28,9 +29,21 @@ export class Menu {
     constructor(button, openPreferences) {
         this._button = button;
         this._openPreferences = openPreferences;
+        this._open = false;
+        this._dirty = false;
+        this._lastState = null;
+        this._openStateId = this._button.menu.connect('open-state-changed', (menu, open) => {
+            this._open = open;
+            if (open && this._dirty && this._lastState)
+                this._render(this._lastState);
+        });
     }
 
-    /** Rebuild the button's menu from a snapshot and the current options. */
+    /**
+     * Store the latest snapshot/options and rebuild the menu only while it is
+     * open. When closed, mark dirty and rebuild on the next open instead of
+     * tearing down and recreating every popup item on every poll.
+     */
     update(snapshot, {
         ramLevel = Level.NONE,
         vramLevel = Level.NONE,
@@ -39,6 +52,35 @@ export class Menu {
         menuShowRam = true,
         menuShowVram = true,
     } = {}) {
+        this._lastState = {
+            snapshot,
+            ramLevel,
+            vramLevel,
+            enableColors,
+            showNormalColor,
+            menuShowRam,
+            menuShowVram,
+        };
+
+        if (this._open) {
+            this._render(this._lastState);
+            this._dirty = false;
+        } else {
+            this._dirty = true;
+        }
+    }
+
+    /** Disconnect the open-state handler before the button is torn down. */
+    destroy() {
+        if (this._openStateId) {
+            this._button.menu.disconnect(this._openStateId);
+            this._openStateId = 0;
+        }
+        this._lastState = null;
+        this._dirty = false;
+    }
+
+    _render({ snapshot, ramLevel, vramLevel, enableColors, showNormalColor, menuShowRam, menuShowVram }) {
         const menu = this._button.menu;
         menu.removeAll();
 

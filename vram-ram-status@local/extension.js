@@ -12,7 +12,7 @@ import * as Alerts from './lib/alerts.js';
 import { Monitor } from './lib/monitor.js';
 import { readingPercent, Status } from './lib/model.js';
 import { notify } from './lib/notify.js';
-import { normalizeRefreshInterval } from './lib/settings.js';
+import { normalizeRefreshInterval, normalizeThresholdPair } from './lib/settings.js';
 import { Indicator } from './ui/indicator.js';
 
 // Settings that only affect how the last snapshot is rendered (re-render on
@@ -121,7 +121,7 @@ export default class VramRamExtension extends Extension {
         const ramFailed = snapshot.ram.status !== Status.OK;
         if (ramFailed !== this._ramFailed) {
             log(ramFailed
-                ? 'vram-ram-status: RAM usage unavailable'
+                ? `vram-ram-status: RAM usage unavailable (${snapshot.ram.errorCode ?? 'unknown'})`
                 : 'vram-ram-status: RAM reading recovered');
             this._ramFailed = ramFailed;
         }
@@ -129,7 +129,7 @@ export default class VramRamExtension extends Extension {
         const vramFailed = snapshot.vram.status !== Status.OK;
         if (vramFailed !== this._vramFailed) {
             log(vramFailed
-                ? 'vram-ram-status: VRAM usage unavailable'
+                ? `vram-ram-status: VRAM usage unavailable (${snapshot.vram.errorCode ?? 'unknown'})`
                 : 'vram-ram-status: VRAM reading recovered');
             this._vramFailed = vramFailed;
         }
@@ -141,18 +141,26 @@ export default class VramRamExtension extends Extension {
             hysteresis: this._settings.get_int('alert-hysteresis'),
             cooldown: this._settings.get_int('alert-cooldown'),
         };
+        const ramThresholds = normalizeThresholdPair(
+            this._settings.get_int('ram-warning'),
+            this._settings.get_int('ram-critical'),
+        );
+        const vramThresholds = normalizeThresholdPair(
+            this._settings.get_int('vram-warning'),
+            this._settings.get_int('vram-critical'),
+        );
 
         const ram = this._evaluateAlert('ram', snapshot.ram, this._alertState.ram, {
             ...common,
             enabled: this._settings.get_boolean('ram-alert-enabled'),
-            warning: this._settings.get_int('ram-warning'),
-            critical: this._settings.get_int('ram-critical'),
+            warning: ramThresholds.warning,
+            critical: ramThresholds.critical,
         });
         const vram = this._evaluateAlert('vram', snapshot.vram, this._alertState.vram, {
             ...common,
             enabled: this._settings.get_boolean('vram-alert-enabled'),
-            warning: this._settings.get_int('vram-warning'),
-            critical: this._settings.get_int('vram-critical'),
+            warning: vramThresholds.warning,
+            critical: vramThresholds.critical,
         });
 
         this._alertState.ram = ram.state;
@@ -162,15 +170,13 @@ export default class VramRamExtension extends Extension {
     }
 
     _evaluateAlert(kind, reading, prevState, cfg) {
-        if (!cfg.enabled) {
-            return { level: Alerts.Level.NONE, state: prevState, notify: false };
-        }
         const percent = readingPercent(reading);
         const result = Alerts.evaluateAlert(percent, {
             warning: cfg.warning,
             critical: cfg.critical,
             hysteresis: cfg.hysteresis,
             cooldown: cfg.cooldown,
+            enabled: cfg.enabled,
             now: reading.timestamp ?? Date.now(),
         }, prevState);
 

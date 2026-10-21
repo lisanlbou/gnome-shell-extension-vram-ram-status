@@ -71,7 +71,9 @@ export function buildDevice({ cardNode, vendorHexText, ueventText }) {
         return null;
     const vendor = vendorFromHex(vendorHexText);
     const uevent = parseUevent(ueventText);
-    const pciSlot = uevent.pciSlot ?? cardNode;
+    const pciSlot = (typeof uevent.pciSlot === 'string' && uevent.pciSlot.length > 0)
+        ? uevent.pciSlot
+        : cardNode;
     const stableId = `pci-${pciSlot}`;
     return {
         cardNode,

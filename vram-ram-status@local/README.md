@@ -42,6 +42,7 @@ Memory is reported with an explicit class:
 | --- | --- |
 | `system` | Host RAM (`MemTotal − MemAvailable`). |
 | `dedicated` | Discrete/dedicated GPU memory (AMD `mem_info_vram_*`). |
+| `visible` | CPU-visible VRAM aperture (AMD `mem_info_vis_vram_*` fallback). |
 | `local` | GPU-local memory (Intel discrete, when counters exist). |
 | `shared` | System memory shared with an integrated GPU (Intel). |
 | `unknown` | Vendor not recognized. |
@@ -51,12 +52,14 @@ reading is shown only when the kernel exposes usable, finite, non-negative
 counters with `used <= total`; anomalous data is reported as unavailable rather
 than as a misleading percentage. Memory classes are never equated across
 vendors: AMD "dedicated" and Intel "local" are not forced into a single
-"universal VRAM total".
+"universal VRAM total", and the AMD visible-VRAM fallback is reported as
+"visible" rather than mislabeled "dedicated".
 
 ## Vendor support
 
 - **AMD** — supported via sysfs `mem_info_vram_used/_total` (dedicated VRAM),
-  falling back to `mem_info_vis_vram_*` when the primary counters are absent.
+  falling back to `mem_info_vis_vram_*` (CPU-visible VRAM) when the primary
+  counters are absent; the fallback is reported as *visible*, never *dedicated*.
 - **Intel** — integrated GPUs share system memory and are reported as *shared*
   with an explicit unavailable state; discrete GPUs are reported as *local*
   memory only when the kernel exposes local-memory counters.

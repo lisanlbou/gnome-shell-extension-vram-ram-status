@@ -56,4 +56,20 @@ export function run(t) {
     r = evaluateAlert(null, { ...BASE, now: 4000000 }, { level: Level.CRITICAL, lastNotifyAt: null });
     eq(r.level, Level.NONE, 'stale -> none');
     eq(r.notify, false, 'stale does not notify');
+
+    // Notifications are gated by `enabled`; the visual level is independent.
+    const disabledCritical = evaluateAlert(95, { ...BASE, enabled: false, now: 5000000 });
+    eq(disabledCritical.level, Level.CRITICAL, 'disabled alerts still compute critical level');
+    eq(disabledCritical.notify, false, 'disabled alerts never notify');
+    eq(disabledCritical.state.lastNotifyAt, null, 'disabled alerts do not consume cooldown');
+
+    const disabledWarning = evaluateAlert(85, { ...BASE, enabled: false, now: 6000000 }, { level: Level.NONE, lastNotifyAt: 123 });
+    eq(disabledWarning.level, Level.WARNING, 'disabled alerts still compute warning level');
+    eq(disabledWarning.notify, false, 'disabled warning does not notify');
+    eq(disabledWarning.state.lastNotifyAt, 123, 'disabled alerts preserve lastNotifyAt');
+
+    // Re-enabling on the already-held level does not re-notify until the next transition.
+    const reenabled = evaluateAlert(95, { ...BASE, enabled: true, now: 5001000 }, disabledCritical.state);
+    eq(reenabled.level, Level.CRITICAL, 'level persists across re-enable');
+    eq(reenabled.notify, false, 'no spurious notify on already-held critical level');
 }

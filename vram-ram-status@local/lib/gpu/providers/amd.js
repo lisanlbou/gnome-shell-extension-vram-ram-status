@@ -35,9 +35,10 @@ export function readVram(cardNode, readText) {
 }
 
 /**
- * Read an AMD device's dedicated VRAM. Falls back to the visible-VRAM counters
- * on configurations that expose only those. Reports unavailable when no
- * usable counter pair exists.
+ * Read an AMD device's memory. Prefers dedicated VRAM; falls back to the
+ * visible-VRAM (aperture) counters on configurations that expose only those,
+ * reported with the `visible` class. Reports unavailable when no usable
+ * counter pair exists.
  */
 export function read(device, io) {
     const base = `/sys/class/drm/${device.cardNode}/device`;
@@ -64,7 +65,7 @@ export function read(device, io) {
         return {
             usedBytes: visible.used,
             totalBytes: visible.total,
-            memoryClass: MemoryClass.DEDICATED,
+            memoryClass: MemoryClass.VISIBLE,
             status: Status.OK,
             errorCode: null,
         };

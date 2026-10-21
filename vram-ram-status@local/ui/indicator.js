@@ -45,6 +45,9 @@ export class Indicator {
         this._ramLevel = Level.NONE;
         this._vramLevel = Level.NONE;
         this._menu = new Menu(this._button, openPreferences);
+        this._metrics = [];
+        this._separators = [];
+        this._lastLayoutKey = null;
     }
 
     /** Add the button to the panel using the configured box and index. */
@@ -54,19 +57,30 @@ export class Indicator {
         Main.panel.addToStatusArea(STATUS_AREA_ROLE, this._button, position, box);
     }
 
-    /** Render a snapshot onto the panel box and dropdown. */
+    /**
+     * Render a snapshot onto the panel box and dropdown. Panel actors are
+     * reused across polls (rebuilt only when their structure changes); the
+     * dropdown is delegated to Menu, which rebuilds lazily.
+     */
     update(snapshot) {
         const options = this._displayOptions();
         const color = this._colorOptions();
-        const box = this._box;
-        box.destroy_all_children();
-
         const metrics = this._visibleMetrics(snapshot, options);
-        metrics.forEach((metric, index) => {
-            if (index > 0)
-                box.add_child(this._label(options.separator));
-            this._appendMetric(box, metric, options, color);
-        });
+
+        const partsByKind = {};
+        for (const metric of metrics) {
+            partsByKind[metric.kind] = Format.formatMetricParts(metric.kind, metric.reading, {
+                format: metric.format,
+                decimals: options.decimals,
+                unitPlacement: options.unitPlacement,
+            });
+        }
+
+        const key = this._layoutKey(metrics, options, partsByKind);
+        if (key !== this._lastLayoutKey)
+            this._rebuild(metrics, options, partsByKind, color);
+        else
+            this._updateInPlace(metrics, options, partsByKind, color);
 
         this._menu.update(snapshot, {
             ramLevel: this._ramLevel,
@@ -102,66 +116,137 @@ export class Indicator {
             }));
     }
 
-    _appendMetric(box, { kind, reading, format, level }, options, color) {
-        const parts = Format.formatMetricParts(kind, reading, {
-            format,
-            decimals: options.decimals,
-            unitPlacement: options.unitPlacement,
+    _layoutKey(metrics, options, partsByKind) {
+        return metrics.map(metric => {
+            const parts = partsByKind[metric.kind];
+            const flags = [
+                Color.markerForLevel(metric.level) ? 'm' : '-',
+                options.showIcons ? 'i' : '-',
+                parts.value !== null ? 'v' : '-',
+                parts.percent !== null ? 'p' : '-',
+            ].join('');
+            return `${metric.kind}:${flags}`;
+        }).join('|');
+    }
+
+    _rebuild(metrics, options, partsByKind, color) {
+        const box = this._box;
+        box.destroy_all_children();
+        this._metrics = [];
+        this._separators = [];
+
+        metrics.forEach((metric, index) => {
+            if (index > 0) {
+                const separator = this._label(options.separator);
+                this._separators.push(separator);
+                box.add_child(separator);
+            }
+            this._createMetric(box, metric, partsByKind[metric.kind], options, color);
         });
 
+        this._lastLayoutKey = this._layoutKey(metrics, options, partsByKind);
+    }
+
+    _updateInPlace(metrics, options, partsByKind, color) {
+        metrics.forEach((metric, index) => {
+            const desc = this._metrics[index];
+            const parts = partsByKind[metric.kind];
+
+            if (desc.marker)
+                desc.marker.text = Color.markerForLevel(metric.level);
+            if (desc.value)
+                desc.value.text = parts.value;
+            if (desc.percent)
+                desc.percent.text = parts.percent;
+
+            this._applyColorClasses(desc, metric.level, color);
+        });
+
+        for (const separator of this._separators)
+            separator.text = options.separator;
+    }
+
+    _createMetric(box, { kind, level }, parts, options, color) {
         const metricBox = new St.BoxLayout({
             style_class: 'vram-ram-metric',
             y_align: Clutter.ActorAlign.CENTER,
         });
 
-        const colorClass = Color.resolveColorClass(level, color);
+        const desc = {
+            kind,
+            box: metricBox,
+            marker: null,
+            markerClass: null,
+            icon: null,
+            value: null,
+            percent: null,
+            colorClass: null,
+            colorTarget: null,
+        };
 
         const marker = Color.markerForLevel(level);
         if (marker) {
-            const markerLabel = this._label(marker);
-            if (colorClass)
-                markerLabel.add_style_class_name(colorClass);
-            metricBox.add_child(markerLabel);
+            desc.marker = this._label(marker);
+            metricBox.add_child(desc.marker);
         }
 
-        let icon = null;
         if (options.showIcons) {
             const iconInfo = METRIC_ICONS[kind] ?? METRIC_ICONS[Kind.VRAM];
-            icon = new St.Icon({
+            desc.icon = new St.Icon({
                 icon_name: iconInfo.iconName,
                 icon_size: 16,
                 accessible_name: iconInfo.accessibleName,
             });
-            metricBox.add_child(icon);
+            metricBox.add_child(desc.icon);
         }
 
-        let value = null;
         if (parts.value !== null) {
-            value = this._label(parts.value);
-            metricBox.add_child(value);
+            desc.value = this._label(parts.value);
+            metricBox.add_child(desc.value);
         }
 
-        let percentage = null;
         if (parts.percent !== null) {
-            percentage = this._label(parts.percent);
-            metricBox.add_child(percentage);
+            desc.percent = this._label(parts.percent);
+            metricBox.add_child(desc.percent);
         }
 
-        if (colorClass)
-            this._applyColor(colorClass, color.target, { metricBox, icon, value, percentage });
+        this._applyColorClasses(desc, level, color);
 
         box.add_child(metricBox);
+        this._metrics.push(desc);
     }
 
-    _applyColor(colorClass, target, { metricBox, icon, value, percentage }) {
-        if (target === 'icon' && icon)
-            icon.add_style_class_name(colorClass);
-        else if (target === 'value' && value)
-            value.add_style_class_name(colorClass);
-        else if (target === 'percentage' && percentage)
-            percentage.add_style_class_name(colorClass);
-        else
-            metricBox.add_style_class_name(colorClass);
+    _colorActor(desc, target) {
+        if (target === 'icon' && desc.icon)
+            return desc.icon;
+        if (target === 'value' && desc.value)
+            return desc.value;
+        if (target === 'percentage' && desc.percent)
+            return desc.percent;
+        return desc.box;
+    }
+
+    _applyColorClasses(desc, level, color) {
+        const newClass = Color.resolveColorClass(level, color);
+
+        // The textual marker is always colored when a color class applies.
+        if (desc.marker) {
+            if (desc.markerClass && desc.markerClass !== newClass)
+                desc.marker.remove_style_class_name(desc.markerClass);
+            if (newClass && newClass !== desc.markerClass)
+                desc.marker.add_style_class_name(newClass);
+            desc.markerClass = newClass;
+        }
+
+        // Re-apply the class to the targeted part (or the whole metric box).
+        if (newClass !== desc.colorClass || color.target !== desc.colorTarget) {
+            if (desc.colorClass)
+                this._colorActor(desc, desc.colorTarget).remove_style_class_name(desc.colorClass);
+            desc.colorClass = newClass;
+            desc.colorTarget = color.target;
+            if (newClass)
+                this._colorActor(desc, color.target).add_style_class_name(newClass);
+        }
     }
 
     _label(text) {
@@ -195,12 +280,18 @@ export class Indicator {
     }
 
     destroy() {
+        if (this._menu) {
+            this._menu.destroy();
+            this._menu = null;
+        }
         if (this._button) {
             this._button.destroy();
             this._button = null;
         }
         this._box = null;
-        this._menu = null;
+        this._metrics = [];
+        this._separators = [];
+        this._lastLayoutKey = null;
     }
 }
 

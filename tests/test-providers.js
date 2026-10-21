@@ -33,6 +33,7 @@ export function run(t) {
     }));
     eq(amdVis.status, Status.OK, 'AMD visible fallback ok');
     eq(amdVis.usedBytes, 50, 'AMD visible used');
+    eq(amdVis.memoryClass, MemoryClass.VISIBLE, 'AMD visible fallback is visible, not dedicated');
 
     // AMD missing counters.
     const amdNone = Amd.read(amd, io({}));

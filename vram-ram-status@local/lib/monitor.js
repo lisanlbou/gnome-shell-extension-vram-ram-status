@@ -22,17 +22,37 @@ const PROVIDERS = [Amd, Intel, Nvidia];
 // missing from the cache (then revalidate immediately).
 const DISCOVERY_REVALIDATE_MS = 30000;
 
+// Default timer backend. Tests inject a different scheduler to drive the timer
+// lifecycle deterministically without a live GLib main loop.
+const DEFAULT_SCHEDULER = Object.freeze({
+    add(seconds, callback) {
+        return GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, seconds, callback);
+    },
+    remove(id) {
+        return GLib.source_remove(id);
+    },
+});
+
+// Default diagnostic sink. Tests inject a capturing logger to assert
+// transition-only logging without relying on the Shell's global `log`.
+const DEFAULT_LOGGER = message => log(message);
+
 export class Monitor {
     constructor({
         refreshSeconds = 2,
         onSnapshot = null,
         io = IO,
         getSelectedGpu = () => 'auto',
+        scheduler = DEFAULT_SCHEDULER,
+        logger = DEFAULT_LOGGER,
     } = {}) {
         this._refreshSeconds = refreshSeconds;
         this._onSnapshot = onSnapshot;
         this._io = io;
         this._getSelectedGpu = getSelectedGpu;
+        this._scheduler = scheduler;
+        this._logger = logger;
+        this._failures = {};
         this._timeout = 0;
         this._inFlight = false;
         this._last = null;
@@ -73,20 +93,29 @@ export class Monitor {
     }
 
     stop() {
+        this._clearTimeout();
+    }
+
+    /** Remove and clear any pending timer source (idempotent). */
+    _clearTimeout() {
         if (this._timeout) {
-            GLib.source_remove(this._timeout);
+            this._scheduler.remove(this._timeout);
             this._timeout = 0;
         }
     }
 
+    /**
+     * Install the recurring timer. The source id stays valid for the source's
+     * whole lifetime (the callback deliberately does NOT clear `_timeout`), so
+     * `stop()` can always cancel it. `_clearTimeout()` first makes re-arming
+     * idempotent and prevents timer accumulation across restarts.
+     */
     _schedule() {
-        this.stop();
-        this._timeout = GLib.timeout_add_seconds(
-            GLib.PRIORITY_DEFAULT, this._refreshSeconds, () => {
-                this._timeout = 0;
-                this._collect();
-                return GLib.SOURCE_CONTINUE;
-            });
+        this._clearTimeout();
+        this._timeout = this._scheduler.add(this._refreshSeconds, () => {
+            this._collect();
+            return GLib.SOURCE_CONTINUE;
+        });
     }
 
     _collect() {
@@ -94,12 +123,67 @@ export class Monitor {
             return;
         this._inFlight = true;
         try {
-            this._last = this.collect();
-            if (this._onSnapshot)
-                this._onSnapshot(this._last);
+            let snapshot;
+            try {
+                snapshot = this.collect();
+                this._last = snapshot;
+                this._logRecovery('collection');
+            } catch (e) {
+                snapshot = this._degradedSnapshot(Date.now());
+                this._last = snapshot;
+                this._logFailure('collection', e);
+            }
+
+            if (this._onSnapshot) {
+                try {
+                    this._onSnapshot(snapshot);
+                    this._logRecovery('snapshot');
+                } catch (e) {
+                    this._logFailure('snapshot', e);
+                }
+            }
         } finally {
             this._inFlight = false;
         }
+    }
+
+    /** Log an unexpected failure once per scope; repeated failures stay silent. */
+    _logFailure(scope, error) {
+        if (this._failures[scope])
+            return;
+        this._failures[scope] = true;
+        const detail = (error && error.message) ? error.message : String(error);
+        this._logger(`vram-ram-status: ${scope} failed: ${detail}`);
+    }
+
+    /** Log recovery from a previously-failed scope exactly once. */
+    _logRecovery(scope) {
+        if (!this._failures[scope])
+            return;
+        delete this._failures[scope];
+        this._logger(`vram-ram-status: ${scope} recovered`);
+    }
+
+    /**
+     * A last-resort snapshot for when collection throws outright. Both metrics
+     * are marked in error so the panel shows N/A rather than freezing on stale
+     * data, and the extension's transition logger still observes the failure.
+     */
+    _degradedSnapshot(now) {
+        const failed = kind => new Reading({
+            kind,
+            status: Status.ERROR,
+            errorCode: 'collect-failed',
+            timestamp: now,
+        });
+        return {
+            ram: failed(Kind.RAM),
+            vram: failed(Kind.VRAM),
+            gpus: [],
+            selection: resolveSelection([], 'auto'),
+            at: now,
+            lastOkAt: this._lastOkAt,
+        };
     }
 
     /** Collect a full snapshot without the callback (used by tests/tooling). */
@@ -132,46 +216,75 @@ export class Monitor {
             selected !== 'auto' && selected !== 'all' &&
             !this._devices.some(device => device.stableId === selected);
         if (stale || selectedMissing || this._devices.length === 0) {
-            this._devices = Discovery.discover(this._io);
-            this._lastDiscovery = now;
+            try {
+                this._devices = Discovery.discover(this._io);
+                this._lastDiscovery = now;
+                this._logRecovery('discovery');
+            } catch (e) {
+                // Keep existing devices (stale but usable) and retry next poll.
+                this._logFailure('discovery', e);
+            }
         }
     }
 
     // REST_INSERT
     _collectRam(now) {
-        const parsed = Ram.parseMeminfo(this._io.readText(PROC_MEMINFO));
-        if (!parsed) {
+        try {
+            const text = this._io.readText(PROC_MEMINFO);
+            const parsed = Ram.parseMeminfo(text);
+            if (!parsed) {
+                return new Reading({
+                    kind: Kind.RAM,
+                    status: Status.ERROR,
+                    errorCode: 'meminfo-parse-failed',
+                    timestamp: now,
+                });
+            }
+            return new Reading({
+                kind: Kind.RAM,
+                usedBytes: parsed.used,
+                totalBytes: parsed.total,
+                memoryClass: MemoryClass.SYSTEM,
+                provider: 'linux',
+                timestamp: now,
+                status: Status.OK,
+            });
+        } catch (e) {
             return new Reading({
                 kind: Kind.RAM,
                 status: Status.ERROR,
-                errorCode: 'meminfo-parse-failed',
+                errorCode: 'ram-read-failed',
                 timestamp: now,
             });
         }
-        return new Reading({
-            kind: Kind.RAM,
-            usedBytes: parsed.used,
-            totalBytes: parsed.total,
-            memoryClass: MemoryClass.SYSTEM,
-            provider: 'linux',
-            timestamp: now,
-            status: Status.OK,
-        });
     }
 
     _collectGpus(now) {
         const results = [];
         for (const device of this._devices) {
             const provider = PROVIDERS.find(p => p.canHandle(device));
-            const partial = provider
-                ? provider.read(device, this._io)
-                : {
+            let partial;
+            if (!provider) {
+                partial = {
                     usedBytes: null,
                     totalBytes: null,
                     memoryClass: MemoryClass.UNKNOWN,
                     status: Status.UNAVAILABLE,
                     errorCode: 'unknown-vendor',
                 };
+            } else {
+                try {
+                    partial = provider.read(device, this._io);
+                } catch (e) {
+                    partial = {
+                        usedBytes: null,
+                        totalBytes: null,
+                        memoryClass: MemoryClass.UNKNOWN,
+                        status: Status.ERROR,
+                        errorCode: 'provider-error',
+                    };
+                }
+            }
             results.push({
                 device,
                 reading: new Reading({

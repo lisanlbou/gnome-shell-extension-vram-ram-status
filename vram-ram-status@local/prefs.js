@@ -206,19 +206,19 @@ export default class VramRamPreferences extends ExtensionPreferences {
 
         const ram = new Adw.PreferencesGroup({
             title: 'RAM alerts',
-            description: 'Notify when RAM usage crosses a threshold.',
+            description: 'Thresholds color the RAM indicator; notifications are optional.',
         });
         page.add(ram);
-        this._switchRow(ram, { title: 'Enable RAM alerts', key: 'ram-alert-enabled' });
+        this._switchRow(ram, { title: 'Enable RAM notifications', subtitle: 'Notify on threshold transitions.', key: 'ram-alert-enabled' });
         this._spinRow(ram, { title: 'Warning threshold', subtitle: 'Percentage of RAM usage.', key: 'ram-warning', lower: 0, upper: 100 });
         this._spinRow(ram, { title: 'Critical threshold', subtitle: 'Percentage of RAM usage.', key: 'ram-critical', lower: 0, upper: 100 });
 
         const vram = new Adw.PreferencesGroup({
             title: 'VRAM alerts',
-            description: 'Notify when the selected GPU memory crosses a threshold.',
+            description: 'Thresholds color the GPU indicator; notifications are optional.',
         });
         page.add(vram);
-        this._switchRow(vram, { title: 'Enable VRAM alerts', key: 'vram-alert-enabled' });
+        this._switchRow(vram, { title: 'Enable VRAM notifications', subtitle: 'Notify on threshold transitions.', key: 'vram-alert-enabled' });
         this._spinRow(vram, { title: 'Warning threshold', subtitle: 'Percentage of VRAM usage.', key: 'vram-warning', lower: 0, upper: 100 });
         this._spinRow(vram, { title: 'Critical threshold', subtitle: 'Percentage of VRAM usage.', key: 'vram-critical', lower: 0, upper: 100 });
 

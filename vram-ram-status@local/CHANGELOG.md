@@ -33,3 +33,21 @@ Complete rewrite of the baseline "VRAM & RAM Status" extension.
 - Removed reliance on St `tooltip_text`, which was removed in GNOME Shell 50
   (St 18); alert/usage detail is now exposed through the menu and a textual
   panel marker instead.
+
+### Hardened
+
+- Timer lifecycle: fixed a leak where the recurring `_schedule()` callback
+  cleared the source id, so `stop()`/`disable()` could leave timers running;
+  restarts no longer accumulate timer sources.
+- Collection: `_collect()` now recovers from collection and callback exceptions
+  with a degraded snapshot and transition-only logging (no per-poll flooding);
+  per-stage isolation keeps RAM, discovery, and per-GPU failures from taking
+  down the whole snapshot.
+- UI: panel actors are updated in place and the dropdown menu is rebuilt lazily
+  on open, eliminating per-poll actor churn.
+- Alerts: visual warning/critical classification is now independent of the
+  notification toggle, so colors work even when notifications are disabled.
+- Memory semantics: added a `visible` memory class so the AMD
+  `mem_info_vis_vram_*` fallback is never mislabeled `dedicated`.
+- Parsing/diagnostics: strict decimal parsing for byte counters, threshold
+  normalization (warning < critical), and error codes included in journal logs.

@@ -7,12 +7,21 @@ import {
     readingFraction,
     isUsable,
     Reading,
+    MemoryClass,
     Status,
     Kind,
 } from '../vram-ram-status@local/lib/model.js';
 
 export function run(t) {
     const { eq } = t;
+
+    // MemoryClass enum
+    eq(MemoryClass.SYSTEM, 'system', 'system class');
+    eq(MemoryClass.DEDICATED, 'dedicated', 'dedicated class');
+    eq(MemoryClass.VISIBLE, 'visible', 'visible class');
+    eq(MemoryClass.SHARED, 'shared', 'shared class');
+    eq(MemoryClass.LOCAL, 'local', 'local class');
+    eq(MemoryClass.UNKNOWN, 'unknown', 'unknown class');
 
     // isValidByteCount
     eq(isValidByteCount(0), true, 'zero is a valid byte count');
@@ -28,6 +37,10 @@ export function run(t) {
     eq(sanitizeBytes('12.5'), null, 'rejects a fractional string');
     eq(sanitizeBytes(null), null, 'null stays null');
     eq(sanitizeBytes(undefined), null, 'undefined stays null');
+    eq(sanitizeBytes(''), null, 'rejects empty string');
+    eq(sanitizeBytes('   '), null, 'rejects whitespace-only string');
+    eq(sanitizeBytes('0x10'), null, 'rejects hex-looking string');
+    eq(sanitizeBytes('12abc'), null, 'rejects trailing junk');
 
     // percentUsed
     eq(percentUsed(50, 100), 50, 'half is 50%');

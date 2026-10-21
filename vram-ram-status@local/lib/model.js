@@ -7,6 +7,7 @@
 export const MemoryClass = Object.freeze({
     SYSTEM: 'system',      // host RAM
     DEDICATED: 'dedicated', // discrete/dedicated GPU memory (VRAM)
+    VISIBLE: 'visible',    // CPU-visible VRAM aperture (AMD fallback)
     SHARED: 'shared',      // system memory shared with the GPU
     LOCAL: 'local',        // GPU-local memory (e.g. Intel discrete)
     UNKNOWN: 'unknown',
@@ -66,14 +67,24 @@ export function isValidByteCount(value) {
     return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
+const BYTES_RE = /^\d+$/;
+
 /**
  * Normalize a raw byte count. Returns the number when it is a valid byte
- * count, otherwise null. Integer strings are coerced conservatively.
+ * count, otherwise null. Integer strings are accepted only in strict plain
+ * decimal form (no empty/whitespace-only, hex, fraction, or trailing junk).
  */
 export function sanitizeBytes(value) {
     if (value === null || value === undefined)
         return null;
-    const n = typeof value === 'number' ? value : Number(value);
+    if (typeof value === 'number')
+        return isValidByteCount(value) ? value : null;
+    if (typeof value !== 'string')
+        return null;
+    const trimmed = value.trim();
+    if (!BYTES_RE.test(trimmed))
+        return null;
+    const n = Number(trimmed);
     return isValidByteCount(n) ? n : null;
 }
 
