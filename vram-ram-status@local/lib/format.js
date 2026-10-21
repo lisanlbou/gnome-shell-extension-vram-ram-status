@@ -3,7 +3,7 @@
 // Pure JavaScript: no Shell/St/GTK/Adwaita imports. Used by both the Shell
 // process (panel label + menu) and the headless unit tests.
 
-import { Kind } from './model.js';
+import { Kind, Status } from './model.js';
 import { DEFAULTS, normalizeDecimals, normalizeFormat, normalizeUnitPlacement } from './settings.js';
 
 const GIB = 1073741824;
@@ -65,7 +65,7 @@ export function formatMetricParts(kind, reading, options = {}) {
     const icon = kind === Kind.RAM ? Kind.RAM : Kind.VRAM;
     const unit = metricUnit(o.unitPlacement);
 
-    if (!reading || reading.status !== 'ok' ||
+    if (!reading || reading.status !== Status.OK ||
         reading.usedBytes === null || reading.totalBytes === null) {
         return { icon, value: 'N/A', percent: null };
     }

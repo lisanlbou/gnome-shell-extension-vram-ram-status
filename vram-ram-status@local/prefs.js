@@ -8,10 +8,18 @@ import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/
 
 import * as Discovery from './lib/gpu/discovery.js';
 import * as IO from './lib/io.js';
+import {
+    FORMATS,
+    METRIC_ORDERS,
+    UNIT_PLACEMENTS,
+    COLOR_TARGETS,
+    PANEL_BOXES,
+    REFRESH_INTERVALS,
+    normalizeRefreshInterval,
+} from './lib/settings.js';
 
 const VERSION = '2.0.0';
 
-const FORMATS = ['percentage', 'used-only', 'used-total', 'used-total-percent', 'used-percent'];
 const FORMAT_LABELS = {
     'percentage': 'Percentage',
     'used-only': 'Used only',
@@ -20,19 +28,16 @@ const FORMAT_LABELS = {
     'used-percent': 'Used + percentage',
 };
 
-const METRIC_ORDERS = ['vram-first', 'ram-first'];
 const METRIC_ORDER_LABELS = {
     'vram-first': 'VRAM first',
     'ram-first': 'RAM first',
 };
 
-const UNIT_PLACEMENTS = ['suffix', 'none'];
 const UNIT_PLACEMENT_LABELS = {
     'suffix': 'After value',
     'none': 'Hidden',
 };
 
-const COLOR_TARGETS = ['whole', 'icon', 'value', 'percentage'];
 const COLOR_TARGET_LABELS = {
     'whole': 'Whole metric',
     'icon': 'Icon only',
@@ -40,14 +45,12 @@ const COLOR_TARGET_LABELS = {
     'percentage': 'Percentage only',
 };
 
-const PANEL_BOXES = ['left', 'center', 'right'];
 const PANEL_BOX_LABELS = {
     'left': 'Left',
     'center': 'Center',
     'right': 'Right',
 };
 
-const REFRESH_INTERVALS = [1, 2, 5, 10, 15, 30, 60];
 const REFRESH_LABELS = {
     1: '1 second',
     2: '2 seconds',
@@ -289,20 +292,4 @@ export default class VramRamPreferences extends ExtensionPreferences {
             subtitle: 'AMD dedicated VRAM is supported natively. Intel and NVIDIA are capability-detected and reported as unavailable when no supported backend is present.',
         }));
     }
-}
-
-function normalizeRefreshInterval(value) {
-    const n = Number(value);
-    if (!Number.isFinite(n))
-        return 10;
-    let best = REFRESH_INTERVALS[0];
-    let bestDelta = Infinity;
-    for (const interval of REFRESH_INTERVALS) {
-        const delta = Math.abs(interval - n);
-        if (delta < bestDelta) {
-            bestDelta = delta;
-            best = interval;
-        }
-    }
-    return best;
 }
