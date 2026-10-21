@@ -11,6 +11,8 @@ import * as testRam from './test-ram.js';
 import * as testFormat from './test-format.js';
 import * as testAmd from './test-amd.js';
 import * as testDiscovery from './test-discovery.js';
+import * as testSelection from './test-selection.js';
+import * as testProviders from './test-providers.js';
 import * as testMonitor from './test-monitor.js';
 import * as testSettings from './test-settings.js';
 
@@ -20,6 +22,8 @@ const suites = [
     ['format', testFormat.run],
     ['amd', testAmd.run],
     ['discovery', testDiscovery.run],
+    ['selection', testSelection.run],
+    ['providers', testProviders.run],
     ['monitor', testMonitor.run],
     ['settings', testSettings.run],
 ];

@@ -1,28 +1,25 @@
 // gpu/providers/amd.js — AMD sysfs dedicated VRAM counters.
 //
-// Parsing helpers are pure and testable; the Shell process injects readText.
-// AMD exposes mem_info_vram_used / mem_info_vram_total under
+// Parsing helpers are pure and testable; the Shell process injects the io
+// reader. AMD exposes mem_info_vram_used / mem_info_vram_total (dedicated
+// VRAM) and mem_info_vis_vram_* (visible VRAM) under
 // /sys/class/drm/cardN/device/.
 
-import { isValidByteCount } from '../../model.js';
+import { parseByteCounters } from '../counters.js';
+import { MemoryClass, Status } from '../../model.js';
 
 export const PROVIDER = 'amd';
 
+export function canHandle(device) {
+    return !!device && device.vendor === PROVIDER;
+}
+
 /**
  * Parse used/total counter text into { used, total } bytes, or null when the
- * counters are missing, malformed, or anomalous (negative used, non-positive
- * total, or used > total).
+ * counters are missing, malformed, or anomalous.
  */
 export function parseVramCounters(usedText, totalText) {
-    if (usedText === null || totalText === null)
-        return null;
-    const used = Number.parseInt(String(usedText).trim(), 10);
-    const total = Number.parseInt(String(totalText).trim(), 10);
-    if (!isValidByteCount(used) || !isValidByteCount(total))
-        return null;
-    if (total <= 0 || used > total)
-        return null;
-    return { used, total };
+    return parseByteCounters(usedText, totalText);
 }
 
 /**
@@ -35,4 +32,49 @@ export function readVram(cardNode, readText) {
         readText(`${base}/mem_info_vram_used`),
         readText(`${base}/mem_info_vram_total`),
     );
+}
+
+/**
+ * Read an AMD device's dedicated VRAM. Falls back to the visible-VRAM counters
+ * on configurations that expose only those. Reports unavailable when no
+ * usable counter pair exists.
+ */
+export function read(device, io) {
+    const base = `/sys/class/drm/${device.cardNode}/device`;
+
+    const dedicated = parseByteCounters(
+        io.readText(`${base}/mem_info_vram_used`),
+        io.readText(`${base}/mem_info_vram_total`),
+    );
+    if (dedicated) {
+        return {
+            usedBytes: dedicated.used,
+            totalBytes: dedicated.total,
+            memoryClass: MemoryClass.DEDICATED,
+            status: Status.OK,
+            errorCode: null,
+        };
+    }
+
+    const visible = parseByteCounters(
+        io.readText(`${base}/mem_info_vis_vram_used`),
+        io.readText(`${base}/mem_info_vis_vram_total`),
+    );
+    if (visible) {
+        return {
+            usedBytes: visible.used,
+            totalBytes: visible.total,
+            memoryClass: MemoryClass.DEDICATED,
+            status: Status.OK,
+            errorCode: null,
+        };
+    }
+
+    return {
+        usedBytes: null,
+        totalBytes: null,
+        memoryClass: MemoryClass.DEDICATED,
+        status: Status.UNAVAILABLE,
+        errorCode: 'amd-counters-missing',
+    };
 }

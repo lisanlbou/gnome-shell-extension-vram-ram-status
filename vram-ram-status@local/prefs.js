@@ -6,6 +6,9 @@ import Gtk from 'gi://Gtk?version=4.0';
 import Adw from 'gi://Adw';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import * as Discovery from './lib/gpu/discovery.js';
+import * as IO from './lib/io.js';
+
 const VERSION = '2.0.0';
 
 const FORMATS = ['used-total', 'percentage', 'used-only', 'used-percent', 'full'];
@@ -51,6 +54,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         this._settings = this.getSettings();
         this._buildDisplayPage(window);
+        this._buildHardwarePage(window);
         this._buildMonitoringPage(window);
         this._buildAboutPage(window);
     }
@@ -146,6 +150,35 @@ export default class VramRamPreferences extends ExtensionPreferences {
     }
 
     // PAGES_INSERT
+    _buildHardwarePage(window) {
+        const page = new Adw.PreferencesPage({
+            title: 'Hardware',
+            icon_name: 'video-display-symbolic',
+        });
+        window.add(page);
+
+        const group = new Adw.PreferencesGroup({
+            title: 'GPU selection',
+            description: 'Which GPU\'s memory is shown in the panel. Devices are identified by stable PCI identity.',
+        });
+        page.add(group);
+
+        const devices = Discovery.discover(IO);
+        const choices = ['auto', 'all', ...devices.map(d => d.stableId)];
+        const labels = { auto: 'Automatic', all: 'All GPUs' };
+        for (const device of devices)
+            labels[device.stableId] = device.displayName;
+
+        this._stringCombo(group, { title: 'GPU', key: 'selected-gpu', choices, labels });
+
+        if (devices.length === 0) {
+            group.add(new Adw.ActionRow({
+                title: 'No GPU detected',
+                subtitle: 'No /sys/class/drm card devices were found.',
+            }));
+        }
+    }
+
     _buildMonitoringPage(window) {
         const page = new Adw.PreferencesPage({
             title: 'Monitoring',

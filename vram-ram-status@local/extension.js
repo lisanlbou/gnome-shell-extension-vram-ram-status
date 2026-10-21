@@ -39,6 +39,7 @@ export default class VramRamExtension extends Extension {
         this._monitor = new Monitor({
             refreshSeconds: this._refreshInterval(),
             onSnapshot: snapshot => this._onSnapshot(snapshot),
+            getSelectedGpu: () => this._settings.get_string('selected-gpu'),
         });
         this._monitor.start();
 
@@ -46,6 +47,7 @@ export default class VramRamExtension extends Extension {
             this._settings.connect('changed::refresh-interval', () => {
                 this._monitor.restart(this._refreshInterval());
             }),
+            this._settings.connect('changed::selected-gpu', () => this._monitor.refreshNow()),
             this._settings.connect('changed::panel-box', () => this._recreateIndicator()),
             this._settings.connect('changed::panel-position', () => this._recreateIndicator()),
             ...DISPLAY_KEYS.map(key =>
