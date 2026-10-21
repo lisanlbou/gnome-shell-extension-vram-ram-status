@@ -6,6 +6,8 @@
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+import * as LoginManager from 'resource:///org/gnome/shell/misc/loginManager.js';
+
 import * as Alerts from './lib/alerts.js';
 import { Monitor } from './lib/monitor.js';
 import { readingPercent, Status } from './lib/model.js';
@@ -62,6 +64,12 @@ export default class VramRamExtension extends Extension {
             getSelectedGpu: () => this._settings.get_string('selected-gpu'),
         });
         this._monitor.start();
+
+        this._loginManager = LoginManager.getLoginManager();
+        this._loginManager.connectObject('prepare-for-sleep', (lm, aboutToSuspend) => {
+            if (!aboutToSuspend && this._monitor)
+                this._monitor.revalidate();
+        }, this);
 
         this._signalIds = [
             this._settings.connect('changed::refresh-interval', () => {
@@ -173,6 +181,10 @@ export default class VramRamExtension extends Extension {
     }
 
     disable() {
+        if (this._loginManager) {
+            this._loginManager.disconnectObject(this);
+            this._loginManager = null;
+        }
         if (this._signalIds) {
             for (const id of this._signalIds)
                 this._settings.disconnect(id);

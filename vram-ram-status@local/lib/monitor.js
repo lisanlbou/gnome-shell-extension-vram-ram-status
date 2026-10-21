@@ -61,6 +61,12 @@ export class Monitor {
         this._collect();
     }
 
+    /** Force device re-discovery on the next collection (e.g. after resume). */
+    revalidate() {
+        this._lastDiscovery = 0;
+        this._collect();
+    }
+
     /** The most recent snapshot, or null before the first collection. */
     get last() {
         return this._last;

@@ -12,7 +12,6 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
 import * as Format from '../lib/format.js';
 import { Level, maxLevel } from '../lib/alerts.js';
-import { Status } from '../lib/model.js';
 import { normalizePanelBox, normalizePanelPosition } from '../lib/settings.js';
 import { Menu } from './menu.js';
 
@@ -32,7 +31,6 @@ export class Indicator {
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._button.add_child(this._label);
-        this._button.tooltip_text = '';
 
         this._ramLevel = Level.NONE;
         this._vramLevel = Level.NONE;
@@ -46,11 +44,10 @@ export class Indicator {
         Main.panel.addToStatusArea(STATUS_AREA_ROLE, this._button, position, box);
     }
 
-    /** Render a snapshot onto the panel label, tooltip and dropdown. */
+    /** Render a snapshot onto the panel label and dropdown. */
     update(snapshot) {
         const label = Format.formatLabel(snapshot, this._displayOptions());
-        this._label.set_text(label);
-        this._button.tooltip_text = this._tooltip(snapshot, label);
+        this._label.set_text(this._alertMarker() + label);
         this._menu.update(snapshot);
     }
 
@@ -82,28 +79,17 @@ export class Indicator {
         };
     }
 
-    _tooltip(snapshot, fallback) {
-        const vram = snapshot.vram;
-        const ram = snapshot.ram;
-        const vramOk = vram.status === Status.OK && vram.usedBytes !== null && vram.totalBytes !== null;
-        const ramOk = ram.status === Status.OK && ram.usedBytes !== null && ram.totalBytes !== null;
-
-        const lines = [];
-        if (vramOk && ramOk) {
-            lines.push(
-                `VRAM ${Format.formatGiB(vram.usedBytes)}/${Format.formatGiB(vram.totalBytes)} GiB`,
-                `RAM ${Format.formatGiB(ram.usedBytes)}/${Format.formatGiB(ram.totalBytes)} GiB`);
-        } else {
-            lines.push(fallback);
-        }
-
-        // Textual alert state, so color is never the only signal.
-        if (this._vramLevel !== Level.NONE)
-            lines.push(`VRAM: ${this._vramLevel}`);
-        if (this._ramLevel !== Level.NONE)
-            lines.push(`RAM: ${this._ramLevel}`);
-
-        return lines.join('\n');
+    /**
+     * A textual alert marker, so warning/critical state is visible without
+     * relying on color (and readable by screen readers). Empty when no alert.
+     */
+    _alertMarker() {
+        const level = maxLevel(this._ramLevel, this._vramLevel);
+        if (level === Level.CRITICAL)
+            return '\u26D4 '; // ⛔ no entry
+        if (level === Level.WARNING)
+            return '\u26A0 '; // ⚠ warning sign
+        return '';
     }
 
     destroy() {
