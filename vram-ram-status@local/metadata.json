@@ -2,5 +2,5 @@
   "uuid": "vram-ram-status@local",
   "name": "VRAM & RAM Status",
   "description": "Displays VRAM and System RAM usage from sysfs and /proc/meminfo",
-  "shell-version": [ "49","50","51","52","53"]
+  "shell-version": [ "50" ]
 }

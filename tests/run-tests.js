@@ -1,0 +1,36 @@
+// tests/run-tests.js — headless unit test runner (no GNOME Shell required).
+//
+// Run with:  gjs -m tests/run-tests.js
+//
+// Only pure-logic modules (no Shell/St/GTK/Adwaita imports) are exercised here.
+// Shell/UI behaviour is validated separately against a live GNOME Shell.
+
+import { runSuite } from './harness.js';
+import * as testModel from './test-model.js';
+import * as testRam from './test-ram.js';
+import * as testFormat from './test-format.js';
+import * as testAmd from './test-amd.js';
+import * as testDiscovery from './test-discovery.js';
+import * as testMonitor from './test-monitor.js';
+
+const suites = [
+    ['model', testModel.run],
+    ['ram', testRam.run],
+    ['format', testFormat.run],
+    ['amd', testAmd.run],
+    ['discovery', testDiscovery.run],
+    ['monitor', testMonitor.run],
+];
+
+let passed = 0;
+let failed = 0;
+
+for (const [name, fn] of suites) {
+    const r = runSuite(name, fn);
+    passed += r.passed;
+    failed += r.failed;
+}
+
+console.log(`\n${passed} passed, ${failed} failed`);
+if (failed > 0)
+    throw new Error(`${failed} test(s) failed`);
