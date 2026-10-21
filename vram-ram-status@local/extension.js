@@ -26,6 +26,7 @@ const DISPLAY_KEYS = [
     'separator',
     'show-ram',
     'show-vram',
+    'show-icons',
 ];
 
 // Settings that affect alert evaluation/colors (re-evaluate immediately).

@@ -13,3 +13,9 @@
 .vram-ram-critical {
   color: #c01c28;
 }
+
+/* Horizontal layout for the per-metric sub-actors (icon, value, percentage)
+ * and the separator between metrics. */
+.vram-ram-indicator {
+  spacing: 4px;
+}

@@ -11,13 +11,13 @@ import * as IO from './lib/io.js';
 
 const VERSION = '2.0.0';
 
-const FORMATS = ['used-total', 'percentage', 'used-only', 'used-percent', 'full'];
+const FORMATS = ['percentage', 'used-only', 'used-total', 'used-total-percent', 'used-percent'];
 const FORMAT_LABELS = {
-    'used-total': 'Used / total',
     'percentage': 'Percentage',
     'used-only': 'Used only',
+    'used-total': 'Used / total',
+    'used-total-percent': 'Used / total + percentage',
     'used-percent': 'Used + percentage',
-    'full': 'Full labels',
 };
 
 const METRIC_ORDERS = ['vram-first', 'ram-first'];
@@ -139,6 +139,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
 
         this._switchRow(format, { title: 'Show RAM', key: 'show-ram' });
         this._switchRow(format, { title: 'Show VRAM', key: 'show-vram' });
+        this._switchRow(format, { title: 'Show icons', subtitle: 'Show a small RAM and GPU icon before each metric.', key: 'show-icons' });
 
         const placement = new Adw.PreferencesGroup({
             title: 'Panel placement',

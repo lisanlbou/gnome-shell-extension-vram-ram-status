@@ -15,9 +15,10 @@ until they are individually validated.
 
 ## Features
 
-- RAM and VRAM as numbers with configurable formats (`used/total`, `percentage`,
-  `used only`, `used + percentage`, `full labels`), metric order, decimal
-  precision, unit placement, separator, and per-metric visibility.
+- RAM and VRAM as numbers with configurable formats (`used/total`,
+  `used/total + percentage`, `percentage`, `used only`, `used + percentage`),
+  metric order, decimal precision, unit placement, separator, per-metric
+  visibility, and optional RAM/GPU icons.
 - Configurable refresh interval (1/2/5/10/15/30/60 s; default **10 s**), applied
   without restarting the Shell.
 - Configurable panel placement (left/center/right + index).
@@ -95,11 +96,12 @@ Hardware, Monitoring, Alerts and About are all editable from Preferences
 | `unit-placement` | `s` | `suffix` | `suffix` / `none` |
 | `separator` | `s` | ` \| ` | Text between metrics |
 | `show-ram` / `show-vram` | `b` | `true` | Per-metric visibility |
+| `show-icons` | `b` | `true` | RAM/GPU icons in the panel |
 | `refresh-interval` | `i` | `10` | 1/2/5/10/15/30/60 s |
 | `panel-box` / `panel-position` | `s` / `i` | `right` / `0` | Panel placement |
 | `selected-gpu` | `s` | `auto` | `auto` / `all` / PCI id |
 | `*-alert-enabled` | `b` | `false` | Per-metric alerts |
-| `*-warning` / `*-critical` | `i` | `80` / `90` | Threshold percent |
+| `*-warning` / `*-critical` | `i` | `80` / `95` | Threshold percent |
 | `alert-cooldown` / `alert-hysteresis` | `i` | `300` / `5` | Anti-flap tuning |
 | `enable-colors` | `b` | `true` | Warning/critical colors |
 
