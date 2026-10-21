@@ -159,12 +159,12 @@ export function normalizeThresholdPair(warning, critical) {
     let w = normalizePercent(warning, DEFAULTS.ramWarning);
     let c = normalizePercent(critical, DEFAULTS.ramCritical);
     if (w >= c) {
+        // Prefer raising critical just above warning; if the pair is still not
+        // strictly ordered (e.g. both at the ceiling), pull warning below it.
         if (c < LIMITS.percentMax)
             c = Math.min(LIMITS.percentMax, w + 1);
-        else
-            w = Math.min(c - 1, LIMITS.percentMax - 1);
+        if (w >= c)
+            w = Math.max(LIMITS.percentMin, c - 1);
     }
-    if (w >= c)
-        w = Math.max(LIMITS.percentMin, c - 1);
     return { warning: w, critical: c };
 }

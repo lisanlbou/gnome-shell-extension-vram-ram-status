@@ -6,22 +6,7 @@
 
 import { Monitor } from '../vram-ram-status@local/lib/monitor.js';
 import { Status } from '../vram-ram-status@local/lib/model.js';
-
-const MEMINFO = 'MemTotal:       32476244 kB\nMemAvailable:   19840216 kB\n';
-
-function amdIo() {
-    const files = {
-        '/proc/meminfo': MEMINFO,
-        '/sys/class/drm/card1/device/vendor': '0x1002',
-        '/sys/class/drm/card1/device/uevent': 'DRIVER=amdgpu\nPCI_SLOT_NAME=0000:c4:00.0\n',
-        '/sys/class/drm/card1/device/mem_info_vram_used': '3000705024',
-        '/sys/class/drm/card1/device/mem_info_vram_total': '34359738368',
-    };
-    return {
-        readText: path => (path in files ? files[path] : null),
-        listDir: () => ['card1', 'card1-DP-1', 'renderD128', 'version'],
-    };
-}
+import { amdIo, MEMINFO } from './fixtures.js';
 
 export function run(t) {
     const { eq } = t;
