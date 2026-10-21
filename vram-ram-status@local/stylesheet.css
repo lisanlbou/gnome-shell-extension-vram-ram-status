@@ -1,0 +1,15 @@
+/* VRAM & RAM Status — scoped, theme-compatible state styles.
+ *
+ * Warning/critical colors match the palette used by the GNOME Shell 50 theme
+ * itself (#cd9309 for warnings, #c01c28 for destructive/error). Color is never
+ * the only signal of state: the dropdown menu and tooltips carry the same
+ * information as text, and alerts emit notifications.
+ */
+
+.vram-ram-warning {
+  color: #cd9309;
+}
+
+.vram-ram-critical {
+  color: #c01c28;
+}

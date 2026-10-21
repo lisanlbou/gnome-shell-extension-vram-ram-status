@@ -38,6 +38,7 @@ export class Monitor {
         this._last = null;
         this._devices = [];
         this._lastDiscovery = 0;
+        this._lastOkAt = null;
     }
 
     /** Start polling: collect once immediately, then schedule the timer. */
@@ -102,12 +103,19 @@ export class Monitor {
         const ram = this._collectRam(now);
         const gpus = this._collectGpus(now);
         const selection = resolveSelection(this._devices, this._getSelectedGpu());
+
+        const anyOk = ram.status === Status.OK ||
+            gpus.some(g => g.reading.status === Status.OK);
+        if (anyOk)
+            this._lastOkAt = now;
+
         return {
             ram,
             vram: this._primaryReading(gpus, selection.primary, now),
             gpus,
             selection,
             at: now,
+            lastOkAt: this._lastOkAt,
         };
     }
 

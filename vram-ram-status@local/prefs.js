@@ -56,6 +56,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
         this._buildDisplayPage(window);
         this._buildHardwarePage(window);
         this._buildMonitoringPage(window);
+        this._buildAlertsPage(window);
         this._buildAboutPage(window);
     }
 
@@ -177,6 +178,47 @@ export default class VramRamPreferences extends ExtensionPreferences {
                 subtitle: 'No /sys/class/drm card devices were found.',
             }));
         }
+    }
+
+    _buildAlertsPage(window) {
+        const page = new Adw.PreferencesPage({
+            title: 'Alerts',
+            icon_name: 'dialog-warning-symbolic',
+        });
+        window.add(page);
+
+        const ram = new Adw.PreferencesGroup({
+            title: 'RAM alerts',
+            description: 'Notify when RAM usage crosses a threshold.',
+        });
+        page.add(ram);
+        this._switchRow(ram, { title: 'Enable RAM alerts', key: 'ram-alert-enabled' });
+        this._spinRow(ram, { title: 'Warning threshold', subtitle: 'Percentage of RAM usage.', key: 'ram-warning', lower: 0, upper: 100 });
+        this._spinRow(ram, { title: 'Critical threshold', subtitle: 'Percentage of RAM usage.', key: 'ram-critical', lower: 0, upper: 100 });
+
+        const vram = new Adw.PreferencesGroup({
+            title: 'VRAM alerts',
+            description: 'Notify when the selected GPU memory crosses a threshold.',
+        });
+        page.add(vram);
+        this._switchRow(vram, { title: 'Enable VRAM alerts', key: 'vram-alert-enabled' });
+        this._spinRow(vram, { title: 'Warning threshold', subtitle: 'Percentage of VRAM usage.', key: 'vram-warning', lower: 0, upper: 100 });
+        this._spinRow(vram, { title: 'Critical threshold', subtitle: 'Percentage of VRAM usage.', key: 'vram-critical', lower: 0, upper: 100 });
+
+        const advanced = new Adw.PreferencesGroup({
+            title: 'Advanced',
+            description: 'Prevent alert flapping and repeated notifications.',
+        });
+        page.add(advanced);
+        this._spinRow(advanced, { title: 'Cooldown', subtitle: 'Minimum seconds between notifications.', key: 'alert-cooldown', lower: 0, upper: 86400 });
+        this._spinRow(advanced, { title: 'Hysteresis', subtitle: 'Percentage points below a threshold required to clear it.', key: 'alert-hysteresis', lower: 0, upper: 50 });
+
+        const appearance = new Adw.PreferencesGroup({
+            title: 'Appearance',
+            description: 'Warning and critical states can also be shown with colors.',
+        });
+        page.add(appearance);
+        this._switchRow(appearance, { title: 'Use colors', subtitle: 'Color the indicator for warning and critical states.', key: 'enable-colors' });
     }
 
     _buildMonitoringPage(window) {

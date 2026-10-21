@@ -1,13 +1,15 @@
 // extension.js — GNOME Shell extension lifecycle and coordination.
 //
 // This module runs inside the GNOME Shell process. It wires the indicator,
-// the monitor, and the GSettings signals. It must never import GTK or Adwaita
-// (those only work in the preferences process).
+// the monitor, the alert state machine, and the GSettings signals. It must
+// never import GTK or Adwaita (those only work in the preferences process).
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+import * as Alerts from './lib/alerts.js';
 import { Monitor } from './lib/monitor.js';
-import { Status } from './lib/model.js';
+import { readingPercent, Status } from './lib/model.js';
+import { notify } from './lib/notify.js';
 import { normalizeRefreshInterval } from './lib/settings.js';
 import { Indicator } from './ui/indicator.js';
 
@@ -24,6 +26,19 @@ const DISPLAY_KEYS = [
     'show-vram',
 ];
 
+// Settings that affect alert evaluation/colors (re-evaluate immediately).
+const ALERT_KEYS = [
+    'ram-alert-enabled',
+    'ram-warning',
+    'ram-critical',
+    'vram-alert-enabled',
+    'vram-warning',
+    'vram-critical',
+    'alert-cooldown',
+    'alert-hysteresis',
+    'enable-colors',
+];
+
 export default class VramRamExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
@@ -33,7 +48,12 @@ export default class VramRamExtension extends Extension {
         this._ramFailed = null;
         this._vramFailed = null;
 
-        this._indicator = new Indicator(this._settings);
+        this._alertState = {
+            ram: { level: Alerts.Level.NONE, lastNotifyAt: null },
+            vram: { level: Alerts.Level.NONE, lastNotifyAt: null },
+        };
+
+        this._indicator = new Indicator(this._settings, () => this.openPreferences());
         this._indicator.enable();
 
         this._monitor = new Monitor({
@@ -52,6 +72,8 @@ export default class VramRamExtension extends Extension {
             this._settings.connect('changed::panel-position', () => this._recreateIndicator()),
             ...DISPLAY_KEYS.map(key =>
                 this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
+            ...ALERT_KEYS.map(key =>
+                this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
         ];
     }
 
@@ -62,14 +84,17 @@ export default class VramRamExtension extends Extension {
     _recreateIndicator() {
         if (this._indicator)
             this._indicator.destroy();
-        this._indicator = new Indicator(this._settings);
+        this._indicator = new Indicator(this._settings, () => this.openPreferences());
         this._indicator.enable();
-        if (this._monitor.last)
+        if (this._monitor.last) {
             this._indicator.update(this._monitor.last);
+            this._reapplyAlertLevels();
+        }
     }
 
     _onSnapshot(snapshot) {
         this._logTransitions(snapshot);
+        this._processAlerts(snapshot);
         this._indicator.update(snapshot);
     }
 
@@ -91,6 +116,62 @@ export default class VramRamExtension extends Extension {
         }
     }
 
+    // ALERTS_INSERT
+    _processAlerts(snapshot) {
+        const common = {
+            hysteresis: this._settings.get_int('alert-hysteresis'),
+            cooldown: this._settings.get_int('alert-cooldown'),
+        };
+
+        const ram = this._evaluateAlert('ram', snapshot.ram, this._alertState.ram, {
+            ...common,
+            enabled: this._settings.get_boolean('ram-alert-enabled'),
+            warning: this._settings.get_int('ram-warning'),
+            critical: this._settings.get_int('ram-critical'),
+        });
+        const vram = this._evaluateAlert('vram', snapshot.vram, this._alertState.vram, {
+            ...common,
+            enabled: this._settings.get_boolean('vram-alert-enabled'),
+            warning: this._settings.get_int('vram-warning'),
+            critical: this._settings.get_int('vram-critical'),
+        });
+
+        this._alertState.ram = ram.state;
+        this._alertState.vram = vram.state;
+
+        this._indicator.setLevels(ram.level, vram.level);
+    }
+
+    _evaluateAlert(kind, reading, prevState, cfg) {
+        if (!cfg.enabled) {
+            return { level: Alerts.Level.NONE, state: prevState, notify: false };
+        }
+        const percent = readingPercent(reading);
+        const result = Alerts.evaluateAlert(percent, {
+            warning: cfg.warning,
+            critical: cfg.critical,
+            hysteresis: cfg.hysteresis,
+            cooldown: cfg.cooldown,
+            now: reading.timestamp ?? Date.now(),
+        }, prevState);
+
+        if (result.notify)
+            this._notify(kind, result.level, Math.round(percent));
+        return result;
+    }
+
+    _notify(kind, level, percent) {
+        const label = kind === 'ram' ? 'RAM' : 'VRAM';
+        notify(
+            `${label} usage ${level}`,
+            `${label} usage is ${percent}% (${level} threshold reached)`,
+        );
+    }
+
+    _reapplyAlertLevels() {
+        this._indicator.setLevels(this._alertState.ram.level, this._alertState.vram.level);
+    }
+
     disable() {
         if (this._signalIds) {
             for (const id of this._signalIds)
@@ -107,7 +188,7 @@ export default class VramRamExtension extends Extension {
         }
         this._ramFailed = null;
         this._vramFailed = null;
+        this._alertState = null;
         this._settings = null;
     }
 }
-
