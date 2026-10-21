@@ -15,9 +15,10 @@ import { notify } from './lib/notify.js';
 import { normalizeRefreshInterval, normalizeThresholdPair } from './lib/settings.js';
 import { Indicator } from './ui/indicator.js';
 
-// Settings that only affect how the last snapshot is rendered (re-render on
-// change rather than moving the panel actor).
-const DISPLAY_KEYS = [
+// Settings that only affect how the current snapshot is rendered (formats,
+// visibility, alert colors, menu toggles); all are handled by re-rendering the
+// latest snapshot on change.
+const REFRESH_KEYS = [
     'ram-format',
     'vram-format',
     'metric-order',
@@ -27,10 +28,6 @@ const DISPLAY_KEYS = [
     'show-ram',
     'show-vram',
     'show-icons',
-];
-
-// Settings that affect alert evaluation/colors (re-evaluate immediately).
-const ALERT_KEYS = [
     'ram-alert-enabled',
     'ram-warning',
     'ram-critical',
@@ -42,10 +39,6 @@ const ALERT_KEYS = [
     'enable-colors',
     'color-target',
     'show-normal-color',
-];
-
-// Settings that only affect the dropdown menu (re-render on change).
-const MENU_KEYS = [
     'menu-show-ram',
     'menu-show-vram',
 ];
@@ -87,11 +80,7 @@ export default class VramRamExtension extends Extension {
             this._settings.connect('changed::selected-gpu', () => this._monitor.refreshNow()),
             this._settings.connect('changed::panel-box', () => this._recreateIndicator()),
             this._settings.connect('changed::panel-position', () => this._recreateIndicator()),
-            ...DISPLAY_KEYS.map(key =>
-                this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
-            ...ALERT_KEYS.map(key =>
-                this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
-            ...MENU_KEYS.map(key =>
+            ...REFRESH_KEYS.map(key =>
                 this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
         ];
     }
@@ -118,20 +107,15 @@ export default class VramRamExtension extends Extension {
     }
 
     _logTransitions(snapshot) {
-        const ramFailed = snapshot.ram.status !== Status.OK;
-        if (ramFailed !== this._ramFailed) {
-            log(ramFailed
-                ? `vram-ram-status: RAM usage unavailable (${snapshot.ram.errorCode ?? 'unknown'})`
-                : 'vram-ram-status: RAM reading recovered');
-            this._ramFailed = ramFailed;
-        }
-
-        const vramFailed = snapshot.vram.status !== Status.OK;
-        if (vramFailed !== this._vramFailed) {
-            log(vramFailed
-                ? `vram-ram-status: VRAM usage unavailable (${snapshot.vram.errorCode ?? 'unknown'})`
-                : 'vram-ram-status: VRAM reading recovered');
-            this._vramFailed = vramFailed;
+        for (const kind of ['ram', 'vram']) {
+            const failed = snapshot[kind].status !== Status.OK;
+            if (failed === this[`_${kind}Failed`])
+                continue;
+            const label = kind === 'ram' ? 'RAM' : 'VRAM';
+            log(failed
+                ? `vram-ram-status: ${label} usage unavailable (${snapshot[kind].errorCode ?? 'unknown'})`
+                : `vram-ram-status: ${label} reading recovered`);
+            this[`_${kind}Failed`] = failed;
         }
     }
 
@@ -141,32 +125,24 @@ export default class VramRamExtension extends Extension {
             hysteresis: this._settings.get_int('alert-hysteresis'),
             cooldown: this._settings.get_int('alert-cooldown'),
         };
-        const ramThresholds = normalizeThresholdPair(
-            this._settings.get_int('ram-warning'),
-            this._settings.get_int('ram-critical'),
-        );
-        const vramThresholds = normalizeThresholdPair(
-            this._settings.get_int('vram-warning'),
-            this._settings.get_int('vram-critical'),
-        );
 
-        const ram = this._evaluateAlert('ram', snapshot.ram, this._alertState.ram, {
-            ...common,
-            enabled: this._settings.get_boolean('ram-alert-enabled'),
-            warning: ramThresholds.warning,
-            critical: ramThresholds.critical,
-        });
-        const vram = this._evaluateAlert('vram', snapshot.vram, this._alertState.vram, {
-            ...common,
-            enabled: this._settings.get_boolean('vram-alert-enabled'),
-            warning: vramThresholds.warning,
-            critical: vramThresholds.critical,
-        });
+        const levels = {};
+        for (const kind of ['ram', 'vram']) {
+            const thresholds = normalizeThresholdPair(
+                this._settings.get_int(`${kind}-warning`),
+                this._settings.get_int(`${kind}-critical`),
+            );
+            const result = this._evaluateAlert(kind, snapshot[kind], this._alertState[kind], {
+                ...common,
+                enabled: this._settings.get_boolean(`${kind}-alert-enabled`),
+                warning: thresholds.warning,
+                critical: thresholds.critical,
+            });
+            this._alertState[kind] = result.state;
+            levels[kind] = result.level;
+        }
 
-        this._alertState.ram = ram.state;
-        this._alertState.vram = vram.state;
-
-        this._indicator.setLevels(ram.level, vram.level);
+        this._indicator.setLevels(levels.ram, levels.vram);
     }
 
     _evaluateAlert(kind, reading, prevState, cfg) {
