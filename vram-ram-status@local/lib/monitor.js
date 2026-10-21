@@ -37,6 +37,17 @@ const DEFAULT_SCHEDULER = Object.freeze({
 // transition-only logging without relying on the Shell's global `log`.
 const DEFAULT_LOGGER = message => log(message);
 
+// An unavailable/error GPU reading body (no usable counters).
+function failedGpu(status, errorCode) {
+    return {
+        usedBytes: null,
+        totalBytes: null,
+        memoryClass: MemoryClass.UNKNOWN,
+        status,
+        errorCode,
+    };
+}
+
 export class Monitor {
     constructor({
         refreshSeconds = 2,
@@ -265,38 +276,22 @@ export class Monitor {
             const provider = PROVIDERS.find(p => p.canHandle(device));
             let partial;
             if (!provider) {
-                partial = {
-                    usedBytes: null,
-                    totalBytes: null,
-                    memoryClass: MemoryClass.UNKNOWN,
-                    status: Status.UNAVAILABLE,
-                    errorCode: 'unknown-vendor',
-                };
+                partial = failedGpu(Status.UNAVAILABLE, 'unknown-vendor');
             } else {
                 try {
                     partial = provider.read(device, this._io);
                 } catch (e) {
-                    partial = {
-                        usedBytes: null,
-                        totalBytes: null,
-                        memoryClass: MemoryClass.UNKNOWN,
-                        status: Status.ERROR,
-                        errorCode: 'provider-error',
-                    };
+                    partial = failedGpu(Status.ERROR, 'provider-error');
                 }
             }
             results.push({
                 device,
                 reading: new Reading({
                     kind: Kind.VRAM,
-                    usedBytes: partial.usedBytes,
-                    totalBytes: partial.totalBytes,
-                    memoryClass: partial.memoryClass,
+                    ...partial,
                     provider: device.vendor,
                     deviceId: device.stableId,
                     timestamp: now,
-                    status: partial.status,
-                    errorCode: partial.errorCode,
                 }),
             });
         }
