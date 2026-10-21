@@ -62,7 +62,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
 
     // --- helpers -----------------------------------------------------------
 
-    _stringCombo(group, { title, subtitle, key, choices, labels }) {
+    _stringCombo(group, { title, subtitle = null, key, choices, labels }) {
         const model = new Gtk.StringList();
         for (const choice of choices)
             model.append(labels[choice] ?? choice);
@@ -80,7 +80,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
         return row;
     }
 
-    _spinRow(group, { title, subtitle, key, lower, upper }) {
+    _spinRow(group, { title, subtitle = null, key, lower, upper }) {
         const row = new Adw.SpinRow({
             title,
             subtitle,
@@ -94,7 +94,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
         return row;
     }
 
-    _switchRow(group, { title, subtitle, key }) {
+    _switchRow(group, { title, subtitle = null, key }) {
         const row = new Adw.SwitchRow({
             title,
             subtitle,
