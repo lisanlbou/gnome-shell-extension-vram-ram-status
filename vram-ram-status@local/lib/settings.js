@@ -50,6 +50,7 @@ export const DEFAULTS = Object.freeze({
     enableColors: true,
     showIcons: true,
     colorTarget: 'whole',
+    showNormalColor: false,
     menuShowRam: true,
     menuShowVram: true,
 });

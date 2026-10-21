@@ -35,6 +35,7 @@ export function run(t) {
     eq(DEFAULTS.vramCritical, 95, 'default VRAM critical is 95');
     eq(DEFAULTS.showIcons, true, 'default show icons');
     eq(DEFAULTS.colorTarget, 'whole', 'default color target whole');
+    eq(DEFAULTS.showNormalColor, false, 'default show normal color false');
     eq(DEFAULTS.menuShowRam, true, 'default menu RAM shown');
     eq(DEFAULTS.menuShowVram, true, 'default menu VRAM shown');
 

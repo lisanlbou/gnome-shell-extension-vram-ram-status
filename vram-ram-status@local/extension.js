@@ -40,6 +40,8 @@ const ALERT_KEYS = [
     'alert-cooldown',
     'alert-hysteresis',
     'enable-colors',
+    'color-target',
+    'show-normal-color',
 ];
 
 export default class VramRamExtension extends Extension {
@@ -96,8 +98,8 @@ export default class VramRamExtension extends Extension {
         this._indicator = new Indicator(this._settings, () => this.openPreferences());
         this._indicator.enable();
         if (this._monitor.last) {
-            this._indicator.update(this._monitor.last);
             this._reapplyAlertLevels();
+            this._indicator.update(this._monitor.last);
         }
     }
 

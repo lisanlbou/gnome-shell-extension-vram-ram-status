@@ -6,6 +6,10 @@
  * information as text, and alerts emit notifications.
  */
 
+.vram-ram-normal {
+  color: #26a269;
+}
+
 .vram-ram-warning {
   color: #cd9309;
 }
@@ -17,5 +21,11 @@
 /* Horizontal layout for the per-metric sub-actors (icon, value, percentage)
  * and the separator between metrics. */
 .vram-ram-indicator {
+  spacing: 4px;
+}
+
+/* Each metric is wrapped in a sub-box so a single style class can color the
+ * whole metric (marker, icon, value and percentage) or an individual part. */
+.vram-ram-metric {
   spacing: 4px;
 }

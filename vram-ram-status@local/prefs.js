@@ -32,6 +32,14 @@ const UNIT_PLACEMENT_LABELS = {
     'none': 'Hidden',
 };
 
+const COLOR_TARGETS = ['whole', 'icon', 'value', 'percentage'];
+const COLOR_TARGET_LABELS = {
+    'whole': 'Whole metric',
+    'icon': 'Icon only',
+    'value': 'Value only',
+    'percentage': 'Percentage only',
+};
+
 const PANEL_BOXES = ['left', 'center', 'right'];
 const PANEL_BOX_LABELS = {
     'left': 'Left',
@@ -216,10 +224,12 @@ export default class VramRamPreferences extends ExtensionPreferences {
 
         const appearance = new Adw.PreferencesGroup({
             title: 'Appearance',
-            description: 'Warning and critical states can also be shown with colors.',
+            description: 'Color warning, critical and (optionally) normal states, per metric or per part.',
         });
         page.add(appearance);
         this._switchRow(appearance, { title: 'Use colors', subtitle: 'Color the indicator for warning and critical states.', key: 'enable-colors' });
+        this._switchRow(appearance, { title: 'Color normal state', subtitle: 'Color the indicator green when no alert is active.', key: 'show-normal-color' });
+        this._stringCombo(appearance, { title: 'Color application', subtitle: 'Which part of each metric changes color.', key: 'color-target', choices: COLOR_TARGETS, labels: COLOR_TARGET_LABELS });
     }
 
     _buildMonitoringPage(window) {

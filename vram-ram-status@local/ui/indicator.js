@@ -2,9 +2,10 @@
 //
 // Runs inside the GNOME Shell process. Wraps a PanelMenu.Button (required by
 // Main.panel.addToStatusArea) containing a horizontal St.BoxLayout that renders
-// each visible metric as sub-actors (icon, numeric value, percentage), with the
-// configured separator between metrics. The dropdown menu and warning/critical
-// styling are delegated to Menu and the alert levels.
+// each visible metric as a sub-box of actors (marker, icon, numeric value,
+// percentage), with the configured separator between metrics. Alert colors are
+// applied per metric and per part (see the "color application mode" setting);
+// the dropdown menu is delegated to Menu.
 
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
@@ -14,16 +15,12 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
 import * as Format from '../lib/format.js';
 import { Kind } from '../lib/model.js';
-import { Level, maxLevel } from '../lib/alerts.js';
-import { normalizePanelBox, normalizePanelPosition } from '../lib/settings.js';
+import { Level } from '../lib/alerts.js';
+import * as Color from '../lib/color.js';
+import { normalizeColorTarget, normalizePanelBox, normalizePanelPosition } from '../lib/settings.js';
 import { Menu } from './menu.js';
 
 const STATUS_AREA_ROLE = 'vram-ram-indicator';
-
-const LEVEL_STYLE = Object.freeze({
-    [Level.WARNING]: 'vram-ram-warning',
-    [Level.CRITICAL]: 'vram-ram-critical',
-});
 
 /** Icon and accessible name for each metric kind ('ram' | 'vram'). */
 const METRIC_ICONS = Object.freeze({
@@ -56,36 +53,24 @@ export class Indicator {
     /** Render a snapshot onto the panel box and dropdown. */
     update(snapshot) {
         const options = this._displayOptions();
+        const color = this._colorOptions();
         const box = this._box;
         box.destroy_all_children();
-
-        const marker = this._alertMarker();
-        if (marker)
-            box.add_child(this._label(marker));
 
         const metrics = this._visibleMetrics(snapshot, options);
         metrics.forEach((metric, index) => {
             if (index > 0)
                 box.add_child(this._label(options.separator));
-            this._appendMetric(box, metric, options);
+            this._appendMetric(box, metric, options, color);
         });
 
         this._menu.update(snapshot);
     }
 
-    /** Set current alert levels and apply the matching color class. */
+    /** Record the current per-metric alert levels (colors are applied on render). */
     setLevels(ramLevel, vramLevel) {
         this._ramLevel = ramLevel;
         this._vramLevel = vramLevel;
-
-        this._box.remove_style_class_name(LEVEL_STYLE[Level.WARNING]);
-        this._box.remove_style_class_name(LEVEL_STYLE[Level.CRITICAL]);
-
-        if (!this._settings.get_boolean('enable-colors'))
-            return;
-        const style = LEVEL_STYLE[maxLevel(ramLevel, vramLevel)];
-        if (style)
-            this._box.add_style_class_name(style);
     }
 
     _visibleMetrics(snapshot, options) {
@@ -93,34 +78,79 @@ export class Indicator {
             ? [Kind.RAM, Kind.VRAM]
             : [Kind.VRAM, Kind.RAM];
         const byKind = {
-            [Kind.RAM]: { reading: snapshot.ram, format: options.ramFormat, show: options.showRam },
-            [Kind.VRAM]: { reading: snapshot.vram, format: options.vramFormat, show: options.showVram },
+            [Kind.RAM]: { reading: snapshot.ram, format: options.ramFormat, show: options.showRam, level: this._ramLevel },
+            [Kind.VRAM]: { reading: snapshot.vram, format: options.vramFormat, show: options.showVram, level: this._vramLevel },
         };
         return order
             .filter(kind => byKind[kind].show)
-            .map(kind => ({ kind, reading: byKind[kind].reading, format: byKind[kind].format }));
+            .map(kind => ({
+                kind,
+                reading: byKind[kind].reading,
+                format: byKind[kind].format,
+                level: byKind[kind].level,
+            }));
     }
 
-    _appendMetric(box, { kind, reading, format }, options) {
+    _appendMetric(box, { kind, reading, format, level }, options, color) {
         const parts = Format.formatMetricParts(kind, reading, {
             format,
             decimals: options.decimals,
             unitPlacement: options.unitPlacement,
         });
 
+        const metricBox = new St.BoxLayout({
+            style_class: 'vram-ram-metric',
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+
+        const colorClass = Color.resolveColorClass(level, color);
+
+        const marker = Color.markerForLevel(level);
+        if (marker) {
+            const markerLabel = this._label(marker);
+            if (colorClass)
+                markerLabel.add_style_class_name(colorClass);
+            metricBox.add_child(markerLabel);
+        }
+
+        let icon = null;
         if (options.showIcons) {
             const iconInfo = METRIC_ICONS[kind] ?? METRIC_ICONS[Kind.VRAM];
-            box.add_child(new St.Icon({
+            icon = new St.Icon({
                 icon_name: iconInfo.iconName,
                 icon_size: 16,
                 accessible_name: iconInfo.accessibleName,
-            }));
+            });
+            metricBox.add_child(icon);
         }
 
-        if (parts.value !== null)
-            box.add_child(this._label(parts.value));
-        if (parts.percent !== null)
-            box.add_child(this._label(parts.percent));
+        let value = null;
+        if (parts.value !== null) {
+            value = this._label(parts.value);
+            metricBox.add_child(value);
+        }
+
+        let percentage = null;
+        if (parts.percent !== null) {
+            percentage = this._label(parts.percent);
+            metricBox.add_child(percentage);
+        }
+
+        if (colorClass)
+            this._applyColor(colorClass, color.target, { metricBox, icon, value, percentage });
+
+        box.add_child(metricBox);
+    }
+
+    _applyColor(colorClass, target, { metricBox, icon, value, percentage }) {
+        if (target === 'icon' && icon)
+            icon.add_style_class_name(colorClass);
+        else if (target === 'value' && value)
+            value.add_style_class_name(colorClass);
+        else if (target === 'percentage' && percentage)
+            percentage.add_style_class_name(colorClass);
+        else
+            metricBox.add_style_class_name(colorClass);
     }
 
     _label(text) {
@@ -144,17 +174,13 @@ export class Indicator {
         };
     }
 
-    /**
-     * A textual alert marker, so warning/critical state is visible without
-     * relying on color (and readable by screen readers). Empty when no alert.
-     */
-    _alertMarker() {
-        const level = maxLevel(this._ramLevel, this._vramLevel);
-        if (level === Level.CRITICAL)
-            return '\u26D4 '; // ⛔ no entry
-        if (level === Level.WARNING)
-            return '\u26A0 '; // ⚠ warning sign
-        return '';
+    /** Settings that determine alert colors (read once per render). */
+    _colorOptions() {
+        return {
+            enableColors: this._settings.get_boolean('enable-colors'),
+            showNormalColor: this._settings.get_boolean('show-normal-color'),
+            target: normalizeColorTarget(this._settings.get_string('color-target')),
+        };
     }
 
     destroy() {

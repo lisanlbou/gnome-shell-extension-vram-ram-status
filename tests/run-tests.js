@@ -16,6 +16,7 @@ import * as testProviders from './test-providers.js';
 import * as testMonitor from './test-monitor.js';
 import * as testSettings from './test-settings.js';
 import * as testAlerts from './test-alerts.js';
+import * as testColor from './test-color.js';
 
 const suites = [
     ['model', testModel.run],
@@ -28,6 +29,7 @@ const suites = [
     ['monitor', testMonitor.run],
     ['settings', testSettings.run],
     ['alerts', testAlerts.run],
+    ['color', testColor.run],
 ];
 
 let passed = 0;

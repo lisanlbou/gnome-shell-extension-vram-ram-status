@@ -214,5 +214,11 @@
       icon, its numeric value, or its percentage.</description>
     </key>
 
+    <key name="show-normal-color" type="b">
+      <default>false</default>
+      <summary>Show normal color</summary>
+      <description>Color the indicator green when no alert is active.</description>
+    </key>
+
   </schema>
 </schemalist>

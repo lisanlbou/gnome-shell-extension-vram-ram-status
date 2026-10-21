@@ -28,8 +28,10 @@ until they are individually validated.
   automatic / specific / all-GPU selection.
 - Separate RAM and VRAM threshold alerts (warning/critical) with hysteresis and
   cooldown; notifications fire only on transitions.
-- Warning/critical colors (disable-able), with a textual marker so state is
-  visible without color alone.
+- Per-metric warning/critical colors (disable-able) with a per-metric textual
+  marker so state is visible without color alone; choose whether the color
+  applies to the whole metric, its icon, its value, or its percentage, and
+  optionally color the normal (green) state.
 
 ## Data semantics
 
@@ -104,6 +106,8 @@ Hardware, Monitoring, Alerts and About are all editable from Preferences
 | `*-warning` / `*-critical` | `i` | `80` / `95` | Threshold percent |
 | `alert-cooldown` / `alert-hysteresis` | `i` | `300` / `5` | Anti-flap tuning |
 | `enable-colors` | `b` | `true` | Warning/critical colors |
+| `color-target` | `s` | `whole` | `whole` / `icon` / `value` / `percentage` |
+| `show-normal-color` | `b` | `false` | Green normal state |
 
 ## Testing
 
