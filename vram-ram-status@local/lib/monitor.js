@@ -42,6 +42,16 @@ export class Monitor {
         this._schedule();
     }
 
+    /** Trigger an immediate collection (no-op if one is already in flight). */
+    refreshNow() {
+        this._collect();
+    }
+
+    /** The most recent snapshot, or null before the first collection. */
+    get last() {
+        return this._last;
+    }
+
     stop() {
         if (this._timeout) {
             GLib.source_remove(this._timeout);

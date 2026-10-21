@@ -2,7 +2,7 @@
 //
 // Runs inside the GNOME Shell process. Wraps a PanelMenu.Button (required by
 // Main.panel.addToStatusArea) containing a single St.Label. The dropdown menu
-// is introduced in the later phase; here the button only carries a tooltip.
+// is introduced in a later phase; here the button only carries a tooltip.
 
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
@@ -11,13 +11,14 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
 import * as Format from '../lib/format.js';
-import { Kind, Status } from '../lib/model.js';
-import { DEFAULTS } from '../lib/settings.js';
+import { Status } from '../lib/model.js';
+import { normalizePanelBox, normalizePanelPosition } from '../lib/settings.js';
 
 const STATUS_AREA_ROLE = 'vram-ram-indicator';
 
 export class Indicator {
-    constructor() {
+    constructor(settings) {
+        this._settings = settings;
         this._button = new PanelMenu.Button(0.0, 'VRAM & RAM Status', false);
         this._label = new St.Label({
             text: 'Loading...',
@@ -27,18 +28,31 @@ export class Indicator {
         this._button.tooltip_text = '';
     }
 
-    /** Add the button to the panel in the requested box at the given index. */
-    enable(box = DEFAULTS.panelBox, position = DEFAULTS.panelPosition) {
+    /** Add the button to the panel using the configured box and index. */
+    enable() {
+        const box = normalizePanelBox(this._settings.get_string('panel-box'));
+        const position = normalizePanelPosition(this._settings.get_int('panel-position'));
         Main.panel.addToStatusArea(STATUS_AREA_ROLE, this._button, position, box);
     }
 
     /** Render a snapshot onto the panel label and tooltip. */
     update(snapshot) {
-        const vramText = Format.formatMetric(Kind.VRAM, snapshot.vram, Format.defaultOptions(Kind.VRAM));
-        const ramText = Format.formatMetric(Kind.RAM, snapshot.ram, Format.defaultOptions(Kind.RAM));
-        const label = `${vramText} | ${ramText}`;
+        const label = Format.formatLabel(snapshot, this._displayOptions());
         this._label.set_text(label);
         this._button.tooltip_text = this._tooltip(snapshot, label);
+    }
+
+    _displayOptions() {
+        return {
+            ramFormat: this._settings.get_string('ram-format'),
+            vramFormat: this._settings.get_string('vram-format'),
+            metricOrder: this._settings.get_string('metric-order'),
+            decimals: this._settings.get_int('decimals'),
+            unitPlacement: this._settings.get_string('unit-placement'),
+            separator: this._settings.get_string('separator'),
+            showRam: this._settings.get_boolean('show-ram'),
+            showVram: this._settings.get_boolean('show-vram'),
+        };
     }
 
     _tooltip(snapshot, fallback) {
@@ -61,3 +75,4 @@ export class Indicator {
         this._label = null;
     }
 }
+

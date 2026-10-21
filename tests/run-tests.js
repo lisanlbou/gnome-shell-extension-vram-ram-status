@@ -12,6 +12,7 @@ import * as testFormat from './test-format.js';
 import * as testAmd from './test-amd.js';
 import * as testDiscovery from './test-discovery.js';
 import * as testMonitor from './test-monitor.js';
+import * as testSettings from './test-settings.js';
 
 const suites = [
     ['model', testModel.run],
@@ -20,6 +21,7 @@ const suites = [
     ['amd', testAmd.run],
     ['discovery', testDiscovery.run],
     ['monitor', testMonitor.run],
+    ['settings', testSettings.run],
 ];
 
 let passed = 0;

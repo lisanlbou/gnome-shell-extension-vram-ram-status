@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.vram-ram-status"
+          path="/org/gnome/shell/extensions/vram-ram-status/">
+
+    <!-- Display -->
+
+    <key name="ram-format" type="s">
+      <default>'used-total'</default>
+      <choices>
+        <choice value="used-total"/>
+        <choice value="percentage"/>
+        <choice value="used-only"/>
+        <choice value="used-percent"/>
+        <choice value="full"/>
+      </choices>
+      <summary>RAM display format</summary>
+      <description>How the RAM metric is rendered in the panel.</description>
+    </key>
+
+    <key name="vram-format" type="s">
+      <default>'used-total'</default>
+      <choices>
+        <choice value="used-total"/>
+        <choice value="percentage"/>
+        <choice value="used-only"/>
+        <choice value="used-percent"/>
+        <choice value="full"/>
+      </choices>
+      <summary>VRAM display format</summary>
+      <description>How the VRAM metric is rendered in the panel.</description>
+    </key>
+
+    <key name="metric-order" type="s">
+      <default>'vram-first'</default>
+      <choices>
+        <choice value="vram-first"/>
+        <choice value="ram-first"/>
+      </choices>
+      <summary>Metric order</summary>
+      <description>Whether VRAM or RAM is shown first in the panel.</description>
+    </key>
+
+    <key name="decimals" type="i">
+      <default>1</default>
+      <range min="0" max="3"/>
+      <summary>Decimal precision</summary>
+      <description>Number of decimal places used when formatting GiB values.</description>
+    </key>
+
+    <key name="unit-placement" type="s">
+      <default>'suffix'</default>
+      <choices>
+        <choice value="suffix"/>
+        <choice value="none"/>
+      </choices>
+      <summary>Unit placement</summary>
+      <description>Whether the GiB unit is shown after the numeric value.</description>
+    </key>
+
+    <key name="separator" type="s">
+      <default>' | '</default>
+      <summary>Separator</summary>
+      <description>Text placed between the VRAM and RAM metrics in the panel.</description>
+    </key>
+
+    <key name="show-ram" type="b">
+      <default>true</default>
+      <summary>Show RAM</summary>
+      <description>Whether the RAM metric is visible in the panel.</description>
+    </key>
+
+    <key name="show-vram" type="b">
+      <default>true</default>
+      <summary>Show VRAM</summary>
+      <description>Whether the VRAM metric is visible in the panel.</description>
+    </key>
+
+    <!-- Monitoring -->
+
+    <key name="refresh-interval" type="i">
+      <default>10</default>
+      <range min="1" max="60"/>
+      <summary>Refresh interval</summary>
+      <description>How often the metrics are refreshed, in seconds. Supported
+      values are 1, 2, 5, 10, 15, 30 and 60.</description>
+    </key>
+
+    <!-- Panel placement -->
+
+    <key name="panel-box" type="s">
+      <default>'right'</default>
+      <choices>
+        <choice value="left"/>
+        <choice value="center"/>
+        <choice value="right"/>
+      </choices>
+      <summary>Panel box</summary>
+      <description>Which panel box the indicator is placed in.</description>
+    </key>
+
+    <key name="panel-position" type="i">
+      <default>0</default>
+      <range min="0" max="100"/>
+      <summary>Panel position</summary>
+      <description>Index within the selected panel box.</description>
+    </key>
+
+    <!-- Hardware / GPU selection -->
+
+    <key name="selected-gpu" type="s">
+      <default>'auto'</default>
+      <summary>Selected GPU</summary>
+      <description>GPU whose VRAM is displayed: 'auto', 'all', or a stable
+      PCI device identity.</description>
+    </key>
+
+    <!-- Alerts -->
+
+    <key name="ram-alert-enabled" type="b">
+      <default>false</default>
+      <summary>RAM alerts</summary>
+      <description>Enable RAM usage threshold alerts.</description>
+    </key>
+
+    <key name="ram-warning" type="i">
+      <default>80</default>
+      <range min="0" max="100"/>
+      <summary>RAM warning threshold</summary>
+      <description>RAM usage percentage that triggers a warning.</description>
+    </key>
+
+    <key name="ram-critical" type="i">
+      <default>90</default>
+      <range min="0" max="100"/>
+      <summary>RAM critical threshold</summary>
+      <description>RAM usage percentage that triggers a critical alert.</description>
+    </key>
+
+    <key name="vram-alert-enabled" type="b">
+      <default>false</default>
+      <summary>VRAM alerts</summary>
+      <description>Enable VRAM usage threshold alerts.</description>
+    </key>
+
+    <key name="vram-warning" type="i">
+      <default>80</default>
+      <range min="0" max="100"/>
+      <summary>VRAM warning threshold</summary>
+      <description>VRAM usage percentage that triggers a warning.</description>
+    </key>
+
+    <key name="vram-critical" type="i">
+      <default>90</default>
+      <range min="0" max="100"/>
+      <summary>VRAM critical threshold</summary>
+      <description>VRAM usage percentage that triggers a critical alert.</description>
+    </key>
+
+    <key name="alert-cooldown" type="i">
+      <default>300</default>
+      <range min="0" max="86400"/>
+      <summary>Alert cooldown</summary>
+      <description>Minimum seconds between repeated notifications for the same
+      metric.</description>
+    </key>
+
+    <key name="alert-hysteresis" type="i">
+      <default>5</default>
+      <range min="0" max="50"/>
+      <summary>Alert hysteresis</summary>
+      <description>Percentage points below a threshold required to clear an
+      alert, preventing flapping.</description>
+    </key>
+
+    <!-- Appearance -->
+
+    <key name="enable-colors" type="b">
+      <default>true</default>
+      <summary>Enable colors</summary>
+      <description>Color the indicator for warning and critical states.</description>
+    </key>
+
+  </schema>
+</schemalist>
