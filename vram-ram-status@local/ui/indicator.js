@@ -22,9 +22,13 @@ import { Menu } from './menu.js';
 
 const STATUS_AREA_ROLE = 'vram-ram-indicator';
 
-/** Icon and accessible name for each metric kind ('ram' | 'vram'). */
+/**
+ * Icon and accessible name for each metric kind ('ram' | 'vram').
+ * RAM uses a memory-stick icon because Adwaita's 'computer-symbolic' and
+ * 'video-display-symbolic' are the identical monitor glyph.
+ */
 const METRIC_ICONS = Object.freeze({
-    [Kind.RAM]: { iconName: 'computer-symbolic', accessibleName: 'RAM' },
+    [Kind.RAM]: { iconName: 'media-flash-symbolic', accessibleName: 'RAM' },
     [Kind.VRAM]: { iconName: 'video-display-symbolic', accessibleName: 'VRAM' },
 });
 
