@@ -6,16 +6,18 @@
 // companion "Panel Apps" extension.
 
 export const FORMATS = Object.freeze([
-    'used-total',
     'percentage',
     'used-only',
+    'used-total',
+    'used-total-percent',
     'used-percent',
-    'full',
 ]);
 
 export const METRIC_ORDERS = Object.freeze(['vram-first', 'ram-first']);
 
 export const UNIT_PLACEMENTS = Object.freeze(['suffix', 'none']);
+
+export const COLOR_TARGETS = Object.freeze(['whole', 'icon', 'value', 'percentage']);
 
 export const PANEL_BOXES = Object.freeze(['left', 'center', 'right']);
 
@@ -39,13 +41,17 @@ export const DEFAULTS = Object.freeze({
     selectedGpu: 'auto',
     ramAlertEnabled: false,
     ramWarning: 80,
-    ramCritical: 90,
+    ramCritical: 95,
     vramAlertEnabled: false,
     vramWarning: 80,
-    vramCritical: 90,
+    vramCritical: 95,
     alertCooldown: 300,
     alertHysteresis: 5,
     enableColors: true,
+    showIcons: true,
+    colorTarget: 'whole',
+    menuShowRam: true,
+    menuShowVram: true,
 });
 
 export const LIMITS = Object.freeze({
@@ -70,6 +76,10 @@ export function clamp(value, min, max) {
 
 /** Validate a display format, falling back to 'used-total'. */
 export function normalizeFormat(value) {
+    // Legacy "full labels" format was removed in favor of compact forms; map
+    // any persisted 'full' value to the closest equivalent.
+    if (value === 'full')
+        return DEFAULTS.ramFormat;
     return FORMATS.includes(value) ? value : DEFAULTS.ramFormat;
 }
 
@@ -79,6 +89,11 @@ export function normalizeMetricOrder(value) {
 
 export function normalizeUnitPlacement(value) {
     return UNIT_PLACEMENTS.includes(value) ? value : DEFAULTS.unitPlacement;
+}
+
+/** Validate a color application mode, falling back to 'whole'. */
+export function normalizeColorTarget(value) {
+    return COLOR_TARGETS.includes(value) ? value : DEFAULTS.colorTarget;
 }
 
 export function normalizePanelBox(value) {
@@ -138,4 +153,24 @@ export function normalizeCooldown(value) {
 /** Validate/bound an alert hysteresis (percentage points). */
 export function normalizeHysteresis(value) {
     return clamp(value, LIMITS.hysteresisMin, LIMITS.hysteresisMax);
+}
+
+/**
+ * Validate a warning/critical threshold pair, guaranteeing the warning
+ * threshold is strictly below the critical threshold. When the pair is
+ * inverted, critical is raised to warning + 1 unless it is already at the
+ * ceiling, in which case warning is pulled below critical.
+ */
+export function normalizeThresholdPair(warning, critical) {
+    let w = normalizePercent(warning, DEFAULTS.ramWarning);
+    let c = normalizePercent(critical, DEFAULTS.ramCritical);
+    if (w >= c) {
+        if (c < LIMITS.percentMax)
+            c = Math.min(LIMITS.percentMax, w + 1);
+        else
+            w = Math.min(c - 1, LIMITS.percentMax - 1);
+    }
+    if (w >= c)
+        w = Math.max(LIMITS.percentMin, c - 1);
+    return { warning: w, critical: c };
 }

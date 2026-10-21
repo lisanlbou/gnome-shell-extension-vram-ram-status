@@ -22,33 +22,12 @@ export function formatGiB(bytes, decimals = DEFAULTS.decimals) {
     return text.includes('.') ? text.replace(/\.?0+$/, '') : text;
 }
 
-/** Short metric prefix used in compact formats. */
-function shortPrefix(kind) {
-    return kind === Kind.RAM ? 'R' : 'V';
-}
-
-/** Long metric label used in the "full" format. */
-function fullPrefix(kind) {
-    return kind === Kind.RAM ? 'RAM' : 'VRAM';
-}
-
 /**
- * The unit suffix appended once to a metric's numeric portion.
- *
- * Mirrors the baseline default: RAM shows " GiB" while the compact VRAM form
- * shows no unit. The "full" format always shows " GiB" for both metrics.
+ * The compact unit suffix appended to a metric's numeric value ("G" for GiB).
  * Returns '' when unit placement is 'none'.
  */
-export function metricUnit(kind, format, unitPlacement) {
-    const f = normalizeFormat(format);
-    const p = normalizeUnitPlacement(unitPlacement);
-    if (p === 'none')
-        return '';
-    if (kind === Kind.RAM)
-        return ' GiB';
-    if (f === 'full')
-        return ' GiB';
-    return '';
+export function metricUnit(unitPlacement) {
+    return normalizeUnitPlacement(unitPlacement) === 'none' ? '' : 'G';
 }
 
 /** Normalize a per-metric format option object. */
@@ -70,43 +49,62 @@ export function defaultOptions(kind) {
 }
 
 /**
- * Render a single metric as panel text.
+ * The structured parts of a rendered metric, used by the indicator to compose
+ * separate actors so the icon, value, or percentage can be colored
+ * independently (see the "color application mode" setting).
  *
- * Returns e.g. "R 14.2/31 GiB", "V 9%", "VRAM 2.9/32 GiB", or "V N/A".
+ * Returns { icon, value, percent }:
+ *   - icon: the metric kind ('ram' | 'vram').
+ *   - value: the numeric portion ("4.2/16G", "4.2G"), or null.
+ *   - percent: the percentage portion ("26%"), or null.
  * A reading is treated as unavailable when it is null, not OK, or missing
- * usable used/total values.
+ * usable used/total values; the value becomes "N/A" and percent is null.
  */
-export function formatMetric(kind, reading, options = {}) {
+export function formatMetricParts(kind, reading, options = {}) {
     const o = normalizeOptions(kind, options);
-    const prefix = o.format === 'full' ? fullPrefix(kind) : shortPrefix(kind);
-    const unit = metricUnit(kind, o.format, o.unitPlacement);
+    const icon = kind === Kind.RAM ? Kind.RAM : Kind.VRAM;
+    const unit = metricUnit(o.unitPlacement);
 
     if (!reading || reading.status !== 'ok' ||
         reading.usedBytes === null || reading.totalBytes === null) {
-        return `${prefix} N/A`;
+        return { icon, value: 'N/A', percent: null };
     }
 
     const used = formatGiB(reading.usedBytes, o.decimals);
     const total = formatGiB(reading.totalBytes, o.decimals);
     if (used === null || total === null)
-        return `${prefix} N/A`;
+        return { icon, value: 'N/A', percent: null };
+
+    const pct = Math.round((reading.usedBytes / reading.totalBytes) * 100);
 
     switch (o.format) {
-        case 'percentage': {
-            const pct = Math.round((reading.usedBytes / reading.totalBytes) * 100);
-            return `${prefix} ${pct}%`;
-        }
+        case 'percentage':
+            return { icon, value: null, percent: `${pct}%` };
         case 'used-only':
-            return `${prefix} ${used}${unit}`;
-        case 'used-percent': {
-            const pct = Math.round((reading.usedBytes / reading.totalBytes) * 100);
-            return `${prefix} ${used}${unit} (${pct}%)`;
-        }
-        case 'full':
+            return { icon, value: `${used}${unit}`, percent: null };
+        case 'used-percent':
+            return { icon, value: `${used}${unit}`, percent: `${pct}%` };
+        case 'used-total-percent':
+            return { icon, value: `${used}/${total}${unit}`, percent: `${pct}%` };
         case 'used-total':
         default:
-            return `${prefix} ${used}/${total}${unit}`;
+            return { icon, value: `${used}/${total}${unit}`, percent: null };
     }
+}
+
+/**
+ * Render a single metric as compact panel text ("4.2/16G 26%", "26%", or
+ * "N/A"). Icons are rendered separately by the indicator, so no text prefix is
+ * included here.
+ */
+export function formatMetric(kind, reading, options = {}) {
+    const parts = formatMetricParts(kind, reading, options);
+    const text = [];
+    if (parts.value !== null)
+        text.push(parts.value);
+    if (parts.percent !== null)
+        text.push(parts.percent);
+    return text.join(' ');
 }
 
 /**

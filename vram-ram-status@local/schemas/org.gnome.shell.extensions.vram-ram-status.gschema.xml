@@ -8,11 +8,11 @@
     <key name="ram-format" type="s">
       <default>'used-total'</default>
       <choices>
-        <choice value="used-total"/>
         <choice value="percentage"/>
         <choice value="used-only"/>
+        <choice value="used-total"/>
+        <choice value="used-total-percent"/>
         <choice value="used-percent"/>
-        <choice value="full"/>
       </choices>
       <summary>RAM display format</summary>
       <description>How the RAM metric is rendered in the panel.</description>
@@ -21,11 +21,11 @@
     <key name="vram-format" type="s">
       <default>'used-total'</default>
       <choices>
-        <choice value="used-total"/>
         <choice value="percentage"/>
         <choice value="used-only"/>
+        <choice value="used-total"/>
+        <choice value="used-total-percent"/>
         <choice value="used-percent"/>
-        <choice value="full"/>
       </choices>
       <summary>VRAM display format</summary>
       <description>How the VRAM metric is rendered in the panel.</description>
@@ -74,6 +74,26 @@
       <default>true</default>
       <summary>Show VRAM</summary>
       <description>Whether the VRAM metric is visible in the panel.</description>
+    </key>
+
+    <key name="show-icons" type="b">
+      <default>true</default>
+      <summary>Show icons</summary>
+      <description>Whether RAM and VRAM icons are shown in the panel.</description>
+    </key>
+
+    <!-- Menu -->
+
+    <key name="menu-show-ram" type="b">
+      <default>true</default>
+      <summary>Show RAM in menu</summary>
+      <description>Whether the RAM section appears in the dropdown menu.</description>
+    </key>
+
+    <key name="menu-show-vram" type="b">
+      <default>true</default>
+      <summary>Show VRAM in menu</summary>
+      <description>Whether the VRAM section appears in the dropdown menu.</description>
     </key>
 
     <!-- Monitoring -->
@@ -131,7 +151,7 @@
     </key>
 
     <key name="ram-critical" type="i">
-      <default>90</default>
+      <default>95</default>
       <range min="0" max="100"/>
       <summary>RAM critical threshold</summary>
       <description>RAM usage percentage that triggers a critical alert.</description>
@@ -151,7 +171,7 @@
     </key>
 
     <key name="vram-critical" type="i">
-      <default>90</default>
+      <default>95</default>
       <range min="0" max="100"/>
       <summary>VRAM critical threshold</summary>
       <description>VRAM usage percentage that triggers a critical alert.</description>
@@ -179,6 +199,19 @@
       <default>true</default>
       <summary>Enable colors</summary>
       <description>Color the indicator for warning and critical states.</description>
+    </key>
+
+    <key name="color-target" type="s">
+      <default>'whole'</default>
+      <choices>
+        <choice value="whole"/>
+        <choice value="icon"/>
+        <choice value="value"/>
+        <choice value="percentage"/>
+      </choices>
+      <summary>Color application mode</summary>
+      <description>Which part of each metric changes color: the whole metric, its
+      icon, its numeric value, or its percentage.</description>
     </key>
 
   </schema>

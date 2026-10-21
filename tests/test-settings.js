@@ -3,6 +3,7 @@
 import {
     DEFAULTS,
     FORMATS,
+    COLOR_TARGETS,
     PANEL_BOXES,
     REFRESH_INTERVALS,
     normalizeFormat,
@@ -15,6 +16,8 @@ import {
     normalizeRefreshInterval,
     normalizeCooldown,
     normalizeHysteresis,
+    normalizeColorTarget,
+    normalizeThresholdPair,
 } from '../vram-ram-status@local/lib/settings.js';
 
 export function run(t) {
@@ -28,11 +31,24 @@ export function run(t) {
     eq(DEFAULTS.panelBox, 'right', 'default panel box is right');
     eq(DEFAULTS.selectedGpu, 'auto', 'default GPU selection is auto');
     eq(DEFAULTS.enableColors, true, 'default colors enabled');
+    eq(DEFAULTS.ramCritical, 95, 'default RAM critical is 95');
+    eq(DEFAULTS.vramCritical, 95, 'default VRAM critical is 95');
+    eq(DEFAULTS.showIcons, true, 'default show icons');
+    eq(DEFAULTS.colorTarget, 'whole', 'default color target whole');
+    eq(DEFAULTS.menuShowRam, true, 'default menu RAM shown');
+    eq(DEFAULTS.menuShowVram, true, 'default menu VRAM shown');
 
     // Format / enum validators
+    eq(FORMATS, ['percentage', 'used-only', 'used-total', 'used-total-percent', 'used-percent'], 'five display formats');
     eq(normalizeFormat('percentage'), 'percentage', 'valid format kept');
+    eq(normalizeFormat('used-total-percent'), 'used-total-percent', 'used/total+percent format kept');
+    eq(normalizeFormat('full'), 'used-total', 'legacy full maps to used-total');
     eq(normalizeFormat('bogus'), 'used-total', 'invalid format -> default');
-    eq(FORMATS.length, 5, 'five display formats');
+
+    // Color target
+    eq(COLOR_TARGETS, ['whole', 'icon', 'value', 'percentage'], 'color targets');
+    eq(normalizeColorTarget('icon'), 'icon', 'valid color target kept');
+    eq(normalizeColorTarget('bogus'), 'whole', 'invalid color target -> whole');
 
     eq(normalizeMetricOrder('ram-first'), 'ram-first', 'valid order kept');
     eq(normalizeMetricOrder('x'), 'vram-first', 'invalid order -> default');
@@ -68,4 +84,11 @@ export function run(t) {
     eq(normalizeCooldown(-1), 0, 'cooldown clamped low');
     eq(normalizeCooldown(999999), 86400, 'cooldown clamped high');
     eq(normalizeHysteresis(999), 50, 'hysteresis clamped high');
+
+    // Threshold pair validation
+    eq(normalizeThresholdPair(80, 95), { warning: 80, critical: 95 }, 'valid pair kept');
+    eq(normalizeThresholdPair(95, 90), { warning: 95, critical: 96 }, 'inverted pair raises critical');
+    eq(normalizeThresholdPair(100, 100), { warning: 99, critical: 100 }, 'ceiling pair pulls warning down');
+    eq(normalizeThresholdPair(0, 0), { warning: 0, critical: 1 }, 'zero pair raises critical');
+    eq(normalizeThresholdPair('x', 'y'), { warning: 80, critical: 95 }, 'non-numeric pair uses defaults');
 }
