@@ -8,6 +8,7 @@
 // the dropdown menu is delegated to Menu.
 
 import Clutter from 'gi://Clutter';
+import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -250,10 +251,16 @@ export class Indicator {
     }
 
     _label(text) {
-        return new St.Label({
+        const label = new St.Label({
             text,
             y_align: Clutter.ActorAlign.CENTER,
         });
+        // St.Label ellipsizes by default (Pango.EllipsizeMode.END), so numeric
+        // values such as "2.9/32G" get truncated to "2.9…" whenever the panel
+        // is short on horizontal space. Disable ellipsization so the full
+        // used/total and percentage text is always visible.
+        label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        return label;
     }
 
     _displayOptions() {
