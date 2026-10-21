@@ -39,15 +39,6 @@ export function normalizeOptions(kind, options = {}) {
     };
 }
 
-/** Default options for a metric kind (the baseline display). */
-export function defaultOptions(kind) {
-    return {
-        format: DEFAULTS.ramFormat,
-        decimals: DEFAULTS.decimals,
-        unitPlacement: DEFAULTS.unitPlacement,
-    };
-}
-
 /**
  * The structured parts of a rendered metric, used by the indicator to compose
  * separate actors so the icon, value, or percentage can be colored

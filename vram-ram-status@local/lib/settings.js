@@ -139,13 +139,6 @@ export function normalizeRefreshInterval(value) {
     return best;
 }
 
-/** Validate a GPU selection string. */
-export function normalizeSelectedGpu(value) {
-    return typeof value === 'string' && value.length > 0
-        ? value
-        : DEFAULTS.selectedGpu;
-}
-
 /** Validate/bound an alert cooldown (seconds). */
 export function normalizeCooldown(value) {
     return clamp(value, LIMITS.cooldownMin, LIMITS.cooldownMax);
