@@ -149,6 +149,14 @@ export default class VramRamPreferences extends ExtensionPreferences {
         this._switchRow(format, { title: 'Show VRAM', key: 'show-vram' });
         this._switchRow(format, { title: 'Show icons', subtitle: 'Show a small RAM and GPU icon before each metric.', key: 'show-icons' });
 
+        const menu = new Adw.PreferencesGroup({
+            title: 'Dropdown menu',
+            description: 'Sections shown in the panel menu, each with a progress bar colored by alert state.',
+        });
+        page.add(menu);
+        this._switchRow(menu, { title: 'Show RAM in menu', key: 'menu-show-ram' });
+        this._switchRow(menu, { title: 'Show VRAM in menu', key: 'menu-show-vram' });
+
         const placement = new Adw.PreferencesGroup({
             title: 'Panel placement',
             description: 'Where in the top panel the indicator appears.',

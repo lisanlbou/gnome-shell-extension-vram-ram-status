@@ -97,6 +97,14 @@ export function readingPercent(reading) {
     return percentUsed(reading.usedBytes, reading.totalBytes);
 }
 
+/** Convenience: fraction (0..1) of used/total for a Reading, or null. */
+export function readingFraction(reading) {
+    const pct = readingPercent(reading);
+    if (pct === null)
+        return null;
+    return Math.min(1, Math.max(0, pct / 100));
+}
+
 /** Whether a Reading carries usable used+total values. */
 export function isUsable(reading) {
     return !!reading &&

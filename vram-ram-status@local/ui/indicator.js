@@ -64,7 +64,14 @@ export class Indicator {
             this._appendMetric(box, metric, options, color);
         });
 
-        this._menu.update(snapshot);
+        this._menu.update(snapshot, {
+            ramLevel: this._ramLevel,
+            vramLevel: this._vramLevel,
+            enableColors: color.enableColors,
+            showNormalColor: color.showNormalColor,
+            menuShowRam: this._settings.get_boolean('menu-show-ram'),
+            menuShowVram: this._settings.get_boolean('menu-show-vram'),
+        });
     }
 
     /** Record the current per-metric alert levels (colors are applied on render). */

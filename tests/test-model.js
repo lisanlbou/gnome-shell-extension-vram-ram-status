@@ -4,6 +4,7 @@ import {
     isValidByteCount,
     sanitizeBytes,
     percentUsed,
+    readingFraction,
     isUsable,
     Reading,
     Status,
@@ -40,4 +41,10 @@ export function run(t) {
     eq(isUsable(new Reading({ kind: Kind.RAM, usedBytes: null, totalBytes: 100, status: Status.OK })), false, 'missing used is not usable');
     eq(isUsable(new Reading({ kind: Kind.RAM, usedBytes: 50, totalBytes: 100, status: Status.ERROR })), false, 'error status is not usable');
     eq(isUsable(null), false, 'null is not usable');
+
+    // readingFraction
+    eq(readingFraction(new Reading({ kind: Kind.RAM, usedBytes: 50, totalBytes: 100, status: Status.OK })), 0.5, 'half -> 0.5');
+    eq(readingFraction(new Reading({ kind: Kind.RAM, usedBytes: 0, totalBytes: 100, status: Status.OK })), 0, 'zero -> 0');
+    eq(readingFraction(new Reading({ kind: Kind.RAM, usedBytes: null, totalBytes: 100, status: Status.OK })), null, 'missing used -> null');
+    eq(readingFraction(null), null, 'null reading -> null');
 }

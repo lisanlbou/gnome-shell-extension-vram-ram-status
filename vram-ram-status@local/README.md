@@ -23,7 +23,8 @@ until they are individually validated.
   without restarting the Shell.
 - Configurable panel placement (left/center/right + index).
 - Native dropdown menu: RAM used/total/available, per-GPU memory, device name,
-  memory class, provider, last successful update, and a Preferences action.
+  memory class, provider, last successful update, and a Preferences action,
+  with per-metric progress bars colored by alert state.
 - Multi-GPU discovery by stable PCI identity (survives `cardN` reordering), with
   automatic / specific / all-GPU selection.
 - Separate RAM and VRAM threshold alerts (warning/critical) with hysteresis and
@@ -99,6 +100,7 @@ Hardware, Monitoring, Alerts and About are all editable from Preferences
 | `separator` | `s` | ` \| ` | Text between metrics |
 | `show-ram` / `show-vram` | `b` | `true` | Per-metric visibility |
 | `show-icons` | `b` | `true` | RAM/GPU icons in the panel |
+| `menu-show-ram` / `menu-show-vram` | `b` | `true` | Menu RAM/VRAM sections |
 | `refresh-interval` | `i` | `10` | 1/2/5/10/15/30/60 s |
 | `panel-box` / `panel-position` | `s` / `i` | `right` / `0` | Panel placement |
 | `selected-gpu` | `s` | `auto` | `auto` / `all` / PCI id |

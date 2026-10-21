@@ -44,6 +44,12 @@ const ALERT_KEYS = [
     'show-normal-color',
 ];
 
+// Settings that only affect the dropdown menu (re-render on change).
+const MENU_KEYS = [
+    'menu-show-ram',
+    'menu-show-vram',
+];
+
 export default class VramRamExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
@@ -84,6 +90,8 @@ export default class VramRamExtension extends Extension {
             ...DISPLAY_KEYS.map(key =>
                 this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
             ...ALERT_KEYS.map(key =>
+                this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
+            ...MENU_KEYS.map(key =>
                 this._settings.connect(`changed::${key}`, () => this._monitor.refreshNow())),
         ];
     }

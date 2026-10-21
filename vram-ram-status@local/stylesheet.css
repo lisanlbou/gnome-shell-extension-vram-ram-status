@@ -29,3 +29,8 @@
 .vram-ram-metric {
   spacing: 4px;
 }
+
+/* Dropdown-menu progress bars are drawn with Cairo (ui/progressBar.js). The
+ * class is a theming hook; the bar supplies its own height and fill color. */
+.vram-ram-bar {
+}
