@@ -1,6 +1,9 @@
 # Changelog
 
-## 2.0.0 — 2026-10-21
+## 0.1.0-alpha — 2026-10-22
+
+First public alpha release (previously tracked internally as 2.0.0). Not yet
+field-tested by end users.
 
 Complete rewrite of the baseline "VRAM & RAM Status" extension.
 

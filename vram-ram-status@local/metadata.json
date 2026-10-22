@@ -5,6 +5,6 @@
   "url": "https://github.com/lisanlbou/gnome-shell-extension-vram-ram-status",
   "shell-version": [ "50" ],
   "settings-schema": "org.gnome.shell.extensions.vram-ram-status",
-  "version-name": "2.0.0",
+  "version-name": "0.1.0-alpha",
   "original-author": "lisandro@local"
 }
