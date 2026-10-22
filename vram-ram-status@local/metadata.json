@@ -2,7 +2,7 @@
   "uuid": "vram-ram-status@local",
   "name": "VRAM & RAM Status",
   "description": "Displays VRAM and System RAM usage from sysfs and /proc/meminfo",
-  "url": "https://example.com/vram-ram-status",
+  "url": "https://github.com/lisanlbou/gnome-shell-extension-vram-ram-status",
   "shell-version": [ "50" ],
   "settings-schema": "org.gnome.shell.extensions.vram-ram-status",
   "version-name": "2.0.0",
