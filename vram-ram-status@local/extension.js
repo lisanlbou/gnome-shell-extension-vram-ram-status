@@ -49,8 +49,8 @@ export default class VramRamExtension extends Extension {
 
         // Transition-only error logging, preserving the baseline behaviour of
         // not spamming the journal on every poll.
-        this._ramFailed = null;
-        this._vramFailed = null;
+        this._ramFailed = false;
+        this._vramFailed = false;
 
         this._alertState = {
             ram: { level: Alerts.Level.NONE, lastNotifyAt: null },
@@ -119,7 +119,6 @@ export default class VramRamExtension extends Extension {
         }
     }
 
-    // ALERTS_INSERT
     _processAlerts(snapshot) {
         const common = {
             hysteresis: this._settings.get_int('alert-hysteresis'),

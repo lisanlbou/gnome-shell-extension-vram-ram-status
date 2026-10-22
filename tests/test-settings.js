@@ -7,15 +7,12 @@ import {
     PANEL_BOXES,
     REFRESH_INTERVALS,
     normalizeFormat,
-    normalizeMetricOrder,
     normalizeUnitPlacement,
     normalizePanelBox,
     normalizePanelPosition,
     normalizeDecimals,
     normalizePercent,
     normalizeRefreshInterval,
-    normalizeCooldown,
-    normalizeHysteresis,
     normalizeColorTarget,
     normalizeThresholdPair,
 } from '../vram-ram-status@local/lib/settings.js';
@@ -51,9 +48,6 @@ export function run(t) {
     eq(normalizeColorTarget('icon'), 'icon', 'valid color target kept');
     eq(normalizeColorTarget('bogus'), 'whole', 'invalid color target -> whole');
 
-    eq(normalizeMetricOrder('ram-first'), 'ram-first', 'valid order kept');
-    eq(normalizeMetricOrder('x'), 'vram-first', 'invalid order -> default');
-
     eq(normalizeUnitPlacement('none'), 'none', 'valid unit placement');
     eq(normalizeUnitPlacement('x'), 'suffix', 'invalid unit placement -> default');
 
@@ -81,10 +75,6 @@ export function run(t) {
     eq(normalizeRefreshInterval(1000), 60, 'interval clamped to 60');
     eq(normalizeRefreshInterval('x'), 10, 'non-numeric interval -> default');
     eq(REFRESH_INTERVALS, [1, 2, 5, 10, 15, 30, 60], 'supported intervals');
-
-    eq(normalizeCooldown(-1), 0, 'cooldown clamped low');
-    eq(normalizeCooldown(999999), 86400, 'cooldown clamped high');
-    eq(normalizeHysteresis(999), 50, 'hysteresis clamped high');
 
     // Threshold pair validation
     eq(normalizeThresholdPair(80, 95), { warning: 80, critical: 95 }, 'valid pair kept');

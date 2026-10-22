@@ -238,7 +238,6 @@ export class Monitor {
         }
     }
 
-    // REST_INSERT
     _collectRam(now) {
         try {
             const text = this._io.readText(PROC_MEMINFO);

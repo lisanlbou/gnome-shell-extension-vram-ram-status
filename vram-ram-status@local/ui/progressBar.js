@@ -15,8 +15,9 @@ const BAR_HEIGHT = 6;
  * A menu progress bar. `fill` is an [r, g, b, a] array (components 0..1), or
  * null to use the theme's foreground color for the neutral state.
  */
-export const ProgressBar = GObject.registerClass(
-class ProgressBar extends St.DrawingArea {
+export const ProgressBar = GObject.registerClass({
+    GTypeName: 'VramRamProgressBar',
+}, class ProgressBar extends St.DrawingArea {
     _init(params = {}) {
         const { fraction = 0, fill = null, ...rest } = params;
         super._init({

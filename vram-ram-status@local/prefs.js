@@ -18,8 +18,6 @@ import {
     normalizeRefreshInterval,
 } from './lib/settings.js';
 
-const VERSION = '2.0.0';
-
 const FORMAT_LABELS = {
     'percentage': 'Percentage',
     'used-only': 'Used only',
@@ -170,7 +168,6 @@ export default class VramRamPreferences extends ExtensionPreferences {
         this._spinRow(placement, { title: 'Panel position', subtitle: 'Index within the selected panel box.', key: 'panel-position', lower: 0, upper: 100 });
     }
 
-    // PAGES_INSERT
     _buildHardwarePage(window) {
         const page = new Adw.PreferencesPage({
             title: 'Hardware',
@@ -285,7 +282,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
         });
         page.add(group);
 
-        group.add(new Adw.ActionRow({ title: 'Version', subtitle: VERSION }));
+        group.add(new Adw.ActionRow({ title: 'Version', subtitle: this.metadata['version-name'] }));
         group.add(new Adw.ActionRow({ title: 'Author', subtitle: 'lisandro@local' }));
         group.add(new Adw.ActionRow({
             title: 'GPU support',

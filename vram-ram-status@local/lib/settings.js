@@ -23,9 +23,6 @@ export const PANEL_BOXES = Object.freeze(['left', 'center', 'right']);
 
 export const REFRESH_INTERVALS = Object.freeze([1, 2, 5, 10, 15, 30, 60]);
 
-/** Well-known GPU selections. Any other value is treated as a stable device id. */
-export const GPU_SELECTIONS = Object.freeze(['auto', 'all']);
-
 export const DEFAULTS = Object.freeze({
     ramFormat: 'used-total',
     vramFormat: 'used-total',
@@ -60,10 +57,6 @@ export const LIMITS = Object.freeze({
     decimalsMax: 3,
     percentMin: 0,
     percentMax: 100,
-    cooldownMin: 0,
-    cooldownMax: 86400,
-    hysteresisMin: 0,
-    hysteresisMax: 50,
     panelPositionMax: 100,
 });
 
@@ -82,10 +75,6 @@ export function normalizeFormat(value) {
     if (value === 'full')
         return DEFAULTS.ramFormat;
     return FORMATS.includes(value) ? value : DEFAULTS.ramFormat;
-}
-
-export function normalizeMetricOrder(value) {
-    return METRIC_ORDERS.includes(value) ? value : DEFAULTS.metricOrder;
 }
 
 export function normalizeUnitPlacement(value) {
@@ -137,16 +126,6 @@ export function normalizeRefreshInterval(value) {
         }
     }
     return best;
-}
-
-/** Validate/bound an alert cooldown (seconds). */
-export function normalizeCooldown(value) {
-    return clamp(value, LIMITS.cooldownMin, LIMITS.cooldownMax);
-}
-
-/** Validate/bound an alert hysteresis (percentage points). */
-export function normalizeHysteresis(value) {
-    return clamp(value, LIMITS.hysteresisMin, LIMITS.hysteresisMax);
 }
 
 /**

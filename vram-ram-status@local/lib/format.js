@@ -31,7 +31,7 @@ export function metricUnit(unitPlacement) {
 }
 
 /** Normalize a per-metric format option object. */
-export function normalizeOptions(kind, options = {}) {
+export function normalizeOptions(options = {}) {
     return {
         format: normalizeFormat(options.format ?? DEFAULTS.ramFormat),
         decimals: normalizeDecimals(options.decimals ?? DEFAULTS.decimals),
@@ -52,7 +52,7 @@ export function normalizeOptions(kind, options = {}) {
  * usable used/total values; the value becomes "N/A" and percent is null.
  */
 export function formatMetricParts(kind, reading, options = {}) {
-    const o = normalizeOptions(kind, options);
+    const o = normalizeOptions(options);
     const icon = kind === Kind.RAM ? Kind.RAM : Kind.VRAM;
     const unit = metricUnit(o.unitPlacement);
 
