@@ -13,7 +13,7 @@ glib-compile-schemas --strict "$EXT/schemas/"
 
 echo "==> Packaging $EXT"
 rm -f "$EXT.shell-extension.zip"
-(cd "$EXT" && zip -qr "../$EXT.shell-extension.zip" .)
+(cd "$EXT" && zip -qr "../$EXT.shell-extension.zip" . -x 'schemas/gschemas.compiled')
 
 echo "==> Done: $EXT.shell-extension.zip"
 echo "    Install with: gnome-extensions install $EXT.shell-extension.zip"
