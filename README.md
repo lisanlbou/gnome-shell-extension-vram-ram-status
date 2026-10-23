@@ -42,6 +42,20 @@ gnome-extensions install vram-ram-status@local.shell-extension.zip
 gjs -m tests/run-tests.js
 ```
 
+## Screenshots
+
+![Panel indicator](screenshots/panel-indicator.png)
+
+![Dropdown menu](screenshots/dropdown-menu.png)
+
+![Preferences — Display](screenshots/preferences-Display.png)
+
+![Preferences — Hardware](screenshots/preferences-Hardware.png)
+
+![Preferences — Alerts](screenshots/preferences-Alerts.png)
+
+![Preferences — Monitoring](screenshots/preferences-Monitoring.png)
+
 ## License
 
 GPL-2.0-or-later. See [LICENSE](vram-ram-status@local/LICENSE).
