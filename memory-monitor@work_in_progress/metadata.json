@@ -6,5 +6,5 @@
   "shell-version": [ "50" ],
   "settings-schema": "org.gnome.shell.extensions.memory-monitor",
   "version-name": "0.1.0-alpha",
-  "original-author": "lisandro@local"
+  "original-author": "lisanlbou@work_in_progress"
 }
