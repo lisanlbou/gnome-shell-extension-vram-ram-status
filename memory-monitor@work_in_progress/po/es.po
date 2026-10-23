@@ -1,0 +1,332 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: memory-monitor 0.1.0-alpha\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 00:00-0300\n"
+"PO-Revision-Date: 2026-10-23 00:00-0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "critical"
+msgstr "crítico"
+
+msgid "warning"
+msgstr "advertencia"
+
+msgid "%s usage %s"
+msgstr "Uso de %s: %s"
+
+msgid "%s usage is %d%% (%s threshold reached)"
+msgstr "El uso de %s es %d%% (umbral de %s alcanzado)"
+
+msgid "Percentage"
+msgstr "Porcentaje"
+
+msgid "Used only"
+msgstr "Solo usado"
+
+msgid "Used / total"
+msgstr "Usado / total"
+
+msgid "Used / total + percentage"
+msgstr "Usado / total + porcentaje"
+
+msgid "Used + percentage"
+msgstr "Usado + porcentaje"
+
+msgid "VRAM first"
+msgstr "VRAM primero"
+
+msgid "RAM first"
+msgstr "RAM primero"
+
+msgid "After value"
+msgstr "Después del valor"
+
+msgid "Hidden"
+msgstr "Oculto"
+
+msgid "Whole metric"
+msgstr "Métrica completa"
+
+msgid "Icon only"
+msgstr "Solo icono"
+
+msgid "Value only"
+msgstr "Solo valor"
+
+msgid "Percentage only"
+msgstr "Solo porcentaje"
+
+msgid "Left"
+msgstr "Izquierda"
+
+msgid "Center"
+msgstr "Centro"
+
+msgid "Right"
+msgstr "Derecha"
+
+msgid "Display"
+msgstr "Pantalla"
+
+msgid "Format"
+msgstr "Formato"
+
+msgid "How RAM and VRAM are rendered in the panel."
+msgstr "Cómo se muestran la RAM y la VRAM en el panel."
+
+msgid "RAM format"
+msgstr "Formato de RAM"
+
+msgid "VRAM format"
+msgstr "Formato de VRAM"
+
+msgid "Metric order"
+msgstr "Orden de las métricas"
+
+msgid "Decimal precision"
+msgstr "Precisión decimal"
+
+msgid "Digits after the decimal point."
+msgstr "Dígitos después del punto decimal."
+
+msgid "Unit placement"
+msgstr "Ubicación de la unidad"
+
+msgid "Separator"
+msgstr "Separador"
+
+msgid "Show RAM"
+msgstr "Mostrar RAM"
+
+msgid "Show VRAM"
+msgstr "Mostrar VRAM"
+
+msgid "Show icons"
+msgstr "Mostrar iconos"
+
+msgid "Show a small RAM and GPU icon before each metric."
+msgstr "Mostrar un pequeño icono de RAM y GPU antes de cada métrica."
+
+msgid "Dropdown menu"
+msgstr "Menú desplegable"
+
+msgid "Sections shown in the panel menu, each with a progress bar colored by alert state."
+msgstr "Secciones mostradas en el menú del panel, cada una con una barra de progreso coloreada según el estado de alerta."
+
+msgid "Show RAM in menu"
+msgstr "Mostrar RAM en el menú"
+
+msgid "Show VRAM in menu"
+msgstr "Mostrar VRAM en el menú"
+
+msgid "Panel placement"
+msgstr "Ubicación en el panel"
+
+msgid "Where in the top panel the indicator appears."
+msgstr "Dónde aparece el indicador en el panel superior."
+
+msgid "Panel box"
+msgstr "Sección del panel"
+
+msgid "Panel position"
+msgstr "Posición en el panel"
+
+msgid "Index within the selected panel box."
+msgstr "Índice dentro de la sección del panel seleccionada."
+
+msgid "Hardware"
+msgstr "Hardware"
+
+msgid "GPU selection"
+msgstr "Selección de GPU"
+
+msgid "Which GPU's memory is shown in the panel. Devices are identified by stable PCI identity."
+msgstr "Qué memoria de GPU se muestra en el panel. Los dispositivos se identifican por su identidad PCI estable."
+
+msgid "Automatic"
+msgstr "Automática"
+
+msgid "All GPUs"
+msgstr "Todas las GPU"
+
+msgid "GPU"
+msgstr "GPU"
+
+msgid "No GPU detected"
+msgstr "No se detectó ninguna GPU"
+
+msgid "No /sys/class/drm card devices were found."
+msgstr "No se encontraron dispositivos de tarjeta en /sys/class/drm."
+
+msgid "Alerts"
+msgstr "Alertas"
+
+msgid "RAM alerts"
+msgstr "Alertas de RAM"
+
+msgid "Thresholds color the RAM indicator; notifications are optional."
+msgstr "Los umbrales colorean el indicador de RAM; las notificaciones son opcionales."
+
+msgid "Enable RAM notifications"
+msgstr "Activar notificaciones de RAM"
+
+msgid "Notify on threshold transitions."
+msgstr "Notificar en las transiciones de umbral."
+
+msgid "Warning threshold"
+msgstr "Umbral de advertencia"
+
+msgid "Percentage of RAM usage."
+msgstr "Porcentaje de uso de RAM."
+
+msgid "Critical threshold"
+msgstr "Umbral crítico"
+
+msgid "VRAM alerts"
+msgstr "Alertas de VRAM"
+
+msgid "Thresholds color the GPU indicator; notifications are optional."
+msgstr "Los umbrales colorean el indicador de GPU; las notificaciones son opcionales."
+
+msgid "Enable VRAM notifications"
+msgstr "Activar notificaciones de VRAM"
+
+msgid "Percentage of VRAM usage."
+msgstr "Porcentaje de uso de VRAM."
+
+msgid "Advanced"
+msgstr "Avanzado"
+
+msgid "Prevent alert flapping and repeated notifications."
+msgstr "Evitar el parpadeo de alertas y las notificaciones repetidas."
+
+msgid "Cooldown"
+msgstr "Enfriamiento"
+
+msgid "Minimum seconds between notifications."
+msgstr "Segundos mínimos entre notificaciones."
+
+msgid "Hysteresis"
+msgstr "Histéresis"
+
+msgid "Percentage points below a threshold required to clear it."
+msgstr "Puntos porcentuales por debajo del umbral necesarios para desactivarlo."
+
+msgid "Appearance"
+msgstr "Apariencia"
+
+msgid "Color warning, critical and (optionally) normal states, per metric or per part."
+msgstr "Colorear los estados de advertencia, crítico y (opcionalmente) normal, por métrica o por parte."
+
+msgid "Use colors"
+msgstr "Usar colores"
+
+msgid "Color the indicator for warning and critical states."
+msgstr "Colorear el indicador para los estados de advertencia y crítico."
+
+msgid "Color normal state"
+msgstr "Colorear estado normal"
+
+msgid "Color the indicator green when no alert is active."
+msgstr "Colorear el indicador de verde cuando no hay ninguna alerta activa."
+
+msgid "Color application"
+msgstr "Aplicación del color"
+
+msgid "Which part of each metric changes color."
+msgstr "Qué parte de cada métrica cambia de color."
+
+msgid "Monitoring"
+msgstr "Monitoreo"
+
+msgid "Refresh"
+msgstr "Actualización"
+
+msgid "How often metrics are collected. Changes apply immediately."
+msgstr "Con qué frecuencia se recopilan las métricas. Los cambios se aplican de inmediato."
+
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d segundo"
+msgstr[1] "%d segundos"
+
+
+msgid "Refresh interval"
+msgstr "Intervalo de actualización"
+
+msgid "About"
+msgstr "Acerca de"
+
+msgid "Memory Monitor"
+msgstr "Monitor de memoria"
+
+msgid "Displays system RAM and GPU memory from /proc/meminfo and sysfs. No network access, no root required."
+msgstr "Muestra la memoria RAM del sistema y de la GPU desde /proc/meminfo y sysfs. Sin acceso a la red y sin permisos de administrador."
+
+msgid "Version"
+msgstr "Versión"
+
+msgid "Author"
+msgstr "Autor"
+
+msgid "GPU support"
+msgstr "Compatibilidad con GPU"
+
+msgid "AMD dedicated VRAM is supported natively. Intel and NVIDIA are capability-detected and reported as unavailable when no supported backend is present."
+msgstr "La VRAM dedicada de AMD es compatible de forma nativa. Intel y NVIDIA se detectan por capacidad y se informan como no disponibles cuando no hay un backend compatible."
+
+msgid "system memory"
+msgstr "memoria del sistema"
+
+msgid "dedicated memory"
+msgstr "memoria dedicada"
+
+msgid "visible memory"
+msgstr "memoria visible"
+
+msgid "shared memory"
+msgstr "memoria compartida"
+
+msgid "local memory"
+msgstr "memoria local"
+
+msgid "unknown memory"
+msgstr "memoria desconocida"
+
+msgid "unknown"
+msgstr "desconocido"
+
+msgid "Preferences"
+msgstr "Preferencias"
+
+msgid "RAM usage %d%%"
+msgstr "Uso de RAM %d%%"
+
+msgid "Used %s / %s GiB · Available %s GiB (%d%%)"
+msgstr "Usado %s / %s GiB · Disponible %s GiB (%d%%)"
+
+msgid "Unavailable"
+msgstr "No disponible"
+
+msgid "%s memory %d%%"
+msgstr "%s: memoria %d%%"
+
+msgid "Used %s / %s GiB (%d%%)"
+msgstr "Usado %s / %s GiB (%d%%)"
+
+msgid "Unavailable (%s)"
+msgstr "No disponible (%s)"
+
+msgid "No successful update yet"
+msgstr "Aún no hay una actualización correcta"
+
+msgid "Updated %s"
+msgstr "Actualizado %s"
+

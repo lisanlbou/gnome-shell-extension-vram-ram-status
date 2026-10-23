@@ -5,6 +5,31 @@ All notable changes to this extension are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Gettext internationalization: `gettext-domain` in `metadata.json`, Shell-side
+  and preferences-side translation helpers, and complete `es` (Spanish) and
+  `pt_BR` (Brazilian Portuguese) catalogs under `po/`.
+- `scripts/update-translations.sh` to extract/refresh catalogs; `build.sh` now
+  validates catalogs and packages with `gnome-extensions pack --podir=po`.
+- Real `GLib.Source.remove` timer regression test (`tests/test-glib-timer.js`).
+
+### Fixed
+
+- `ui/progressBar.js` `vfunc_get_preferred_height` now returns the required
+  `[minimum, natural]` pair instead of a scalar.
+- Timer removal uses the modern `GLib.Source.remove` API.
+
+### Changed
+
+- Dropdown menu rows update in place while open (no `removeAll()` per poll),
+  rebuilding only when the structure changes, so keyboard focus is preserved
+  during refreshes.
+- Progress bars are exposed to AT-SPI as level bars with a readable value;
+  alert markers announce "warning"/"critical" in words.
+
 ## [0.1.0-alpha] — 2026-10-23
 
 First public alpha release (previously tracked internally as 2.0.0).

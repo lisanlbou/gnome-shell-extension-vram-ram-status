@@ -4,7 +4,12 @@
 // widget: a St.DrawingArea whose vfunc_repaint draws a rounded track and a
 // fill whose width is proportional to a 0..1 fraction. The fill color is
 // resolved by lib/color.js so this widget stays a thin drawing layer.
+//
+// Accessibility: the widget is exposed as an Atk level bar (like GNOME's
+// BarLevel) with a GenericAccessible that reports the current 0..1 value, so
+// screen readers can announce the bar's state rather than a nameless canvas.
 
+import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
@@ -17,6 +22,12 @@ const BAR_HEIGHT = 6;
  */
 export const ProgressBar = GObject.registerClass({
     GTypeName: 'MemoryMonitorProgressBar',
+    Properties: {
+        'value': GObject.ParamSpec.double(
+            'value', null, null,
+            GObject.ParamFlags.READWRITE,
+            0, 1, 0),
+    },
 }, class ProgressBar extends St.DrawingArea {
     _init(params = {}) {
         const { fraction = 0, fill = null, ...rest } = params;
@@ -24,10 +35,34 @@ export const ProgressBar = GObject.registerClass({
             x_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
             reactive: false,
+            accessible_role: Atk.Role.LEVEL_BAR,
             ...rest,
         });
         this._fraction = this._clampFraction(fraction);
         this._fill = fill;
+
+        // Expose the 0..1 fraction through a GenericAccessible so Orca reads a
+        // progress value (current/minimum/maximum) instead of an empty canvas.
+        this._customAccessible = St.GenericAccessible.new_for_actor(this);
+        this.set_accessible(this._customAccessible);
+        this._customAccessible.connect('get-current-value', this._getCurrentValue.bind(this));
+        this._customAccessible.connect('get-minimum-value', this._getMinimumValue.bind(this));
+        this._customAccessible.connect('get-maximum-value', this._getMaximumValue.bind(this));
+        this._customAccessible.connect('set-current-value', this._setCurrentValue.bind(this));
+    }
+
+    /** The current 0..1 fraction, exposed as a GObject property for a11y. */
+    get value() {
+        return this._fraction;
+    }
+
+    set value(value) {
+        const clamped = this._clampFraction(value);
+        if (clamped === this._fraction)
+            return;
+        this._fraction = clamped;
+        this.notify('value');
+        this.queue_repaint();
     }
 
     /** Update the fraction (0..1) and fill color, repainting only on change. */
@@ -37,6 +72,7 @@ export const ProgressBar = GObject.registerClass({
             return;
         this._fraction = value;
         this._fill = fill;
+        this.notify('value');
         this.queue_repaint();
     }
 
@@ -47,8 +83,29 @@ export const ProgressBar = GObject.registerClass({
         return Math.min(1, Math.max(0, n));
     }
 
+    _getCurrentValue() {
+        return this._fraction;
+    }
+
+    _getMinimumValue() {
+        return 0;
+    }
+
+    _getMaximumValue() {
+        return 1;
+    }
+
+    _setCurrentValue(_actor, value) {
+        this.value = value;
+    }
+
+    // Clutter.Actor.get_preferred_height must return a [minimum, natural] pair.
+    // Returning the scalar BAR_HEIGHT was the original defect: GJS maps the
+    // single return value to "minimum" and leaves "natural" unset (0), so the
+    // actor could collapse to zero height. GNOME's own BarLevel returns
+    // themeNode.adjust_preferred_height(height, height) — a [min, natural] pair.
     vfunc_get_preferred_height(_forWidth) {
-        return BAR_HEIGHT;
+        return [BAR_HEIGHT, BAR_HEIGHT];
     }
 
     vfunc_repaint() {

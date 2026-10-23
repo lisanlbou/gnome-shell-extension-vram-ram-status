@@ -114,6 +114,22 @@ Hardware, Monitoring, Alerts and About are all editable from Preferences
 | `color-target` | `s` | `whole` | `whole` / `icon` / `value` / `percentage` |
 | `show-normal-color` | `b` | `false` | Green normal state |
 
+## Translations
+
+User-visible strings are translatable via Gettext. English is the source
+language; **Spanish (`es`)** and **Brazilian Portuguese (`pt_BR`)** catalogs
+ship in `po/` and are compiled into `locale/<lang>/LC_MESSAGES/` at packaging
+time.
+
+To extract new strings or refresh the catalogs after editing source:
+
+```sh
+./scripts/update-translations.sh
+```
+
+The build (`./build.sh`) validates every catalog with `msgfmt --check` and
+packages the compiled `.mo` files with `gnome-extensions pack --podir=po`.
+
 ## Testing
 
 ```sh
@@ -121,8 +137,8 @@ gjs -m tests/run-tests.js
 ```
 
 The pure-logic modules (parsers, formatter, selection, alert state machine,
-providers, discovery) are exercised headless. Shell/UI behaviour requires a
-live or nested GNOME Shell session.
+providers, discovery, and the real GLib timer API) are exercised headless.
+Shell/UI behaviour requires a live or nested GNOME Shell session.
 
 ## Troubleshooting
 

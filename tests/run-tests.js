@@ -20,6 +20,7 @@ import * as testMonitorRecovery from './test-monitor-recovery.js';
 import * as testSettings from './test-settings.js';
 import * as testAlerts from './test-alerts.js';
 import * as testColor from './test-color.js';
+import * as testGlibTimer from './test-glib-timer.js';
 
 const suites = [
     ['model', testModel.run],
@@ -36,6 +37,7 @@ const suites = [
     ['settings', testSettings.run],
     ['alerts', testAlerts.run],
     ['color', testColor.run],
+    ['glib-timer', testGlibTimer.run],
 ];
 
 let passed = 0;

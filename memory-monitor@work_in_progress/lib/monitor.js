@@ -29,7 +29,10 @@ const DEFAULT_SCHEDULER = Object.freeze({
         return GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, seconds, callback);
     },
     remove(id) {
-        return GLib.source_remove(id);
+        // `GLib.Source.remove(sourceId)` is the modern API; `GLib.source_remove`
+        // is the legacy alias. Both exist through GNOME 51, but the static
+        // Source method is the documented, non-deprecated form to rely on.
+        return GLib.Source.remove(id);
     },
 });
 

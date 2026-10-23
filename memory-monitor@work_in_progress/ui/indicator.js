@@ -15,6 +15,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
 import * as Format from '../lib/format.js';
+import { _ } from '../lib/gettext.js';
 import { Kind } from '../lib/model.js';
 import { Level } from '../lib/alerts.js';
 import * as Color from '../lib/color.js';
@@ -153,8 +154,10 @@ export class Indicator {
             const desc = this._metrics[index];
             const parts = partsByKind[metric.kind];
 
-            if (desc.marker)
+            if (desc.marker) {
                 desc.marker.text = Color.markerForLevel(metric.level);
+                desc.marker.accessible_name = this._markerAccessibleName(metric.level) ?? '';
+            }
             if (desc.value)
                 desc.value.text = parts.value;
             if (desc.percent)
@@ -168,9 +171,11 @@ export class Indicator {
     }
 
     _createMetric(box, { kind, level }, parts, options, color) {
+        const metricKindName = (METRIC_ICONS[kind] ?? METRIC_ICONS[Kind.VRAM]).accessibleName;
         const metricBox = new St.BoxLayout({
             style_class: 'memory-monitor-metric',
             y_align: Clutter.ActorAlign.CENTER,
+            accessible_name: metricKindName,
         });
 
         const desc = {
@@ -188,6 +193,9 @@ export class Indicator {
         const marker = Color.markerForLevel(level);
         if (marker) {
             desc.marker = this._label(marker);
+            const markerName = this._markerAccessibleName(level);
+            if (markerName)
+                desc.marker.accessible_name = markerName;
             metricBox.add_child(desc.marker);
         }
 
@@ -261,6 +269,19 @@ export class Indicator {
         // used/total and percentage text is always visible.
         label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         return label;
+    }
+
+    /**
+     * A human-readable word for an alert level, used as the accessible name of
+     * the ⚠/⛔ marker so screen readers announce "warning"/"critical" instead of
+     * the bare Unicode symbol. Returns null for the normal state (no marker).
+     */
+    _markerAccessibleName(level) {
+        if (level === Level.CRITICAL)
+            return _('critical');
+        if (level === Level.WARNING)
+            return _('warning');
+        return null;
     }
 
     _displayOptions() {

@@ -9,6 +9,7 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as LoginManager from 'resource:///org/gnome/shell/misc/loginManager.js';
 
 import * as Alerts from './lib/alerts.js';
+import { _ } from './lib/gettext.js';
 import { Monitor } from './lib/monitor.js';
 import { readingPercent, Status } from './lib/model.js';
 import { notify } from './lib/notify.js';
@@ -162,9 +163,10 @@ export default class MemoryMonitorExtension extends Extension {
 
     _notify(kind, level, percent) {
         const label = kind === 'ram' ? 'RAM' : 'VRAM';
+        const levelText = level === Alerts.Level.CRITICAL ? _('critical') : _('warning');
         notify(
-            `${label} usage ${level}`,
-            `${label} usage is ${percent}% (${level} threshold reached)`,
+            _('%s usage %s').format(label, levelText),
+            _('%s usage is %d%% (%s threshold reached)').format(label, percent, levelText),
         );
     }
 
