@@ -4,6 +4,8 @@ A GNOME Shell extension that shows system RAM and GPU (VRAM) memory usage
 directly in the top panel. It reads only `/proc/meminfo` and `/sys` — no network
 access, no root privileges, and no synchronous subprocesses.
 
+Vibe-coded with DeepSeek (coding & planning) and ChatGPT (planning).
+
 ## Features
 
 - RAM and VRAM as numbers with configurable formats, precision, units,
