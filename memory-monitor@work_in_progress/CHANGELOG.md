@@ -1,20 +1,14 @@
 # Changelog
 
-## Unreleased
+All notable changes to this extension are documented here.
 
-### Changed
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
 
-- Renamed the extension from "VRAM & RAM Status" to **Memory Monitor**.
-  - UUID: `vram-ram-status@local` → `memory-monitor@work_in_progress`
-  - GSettings schema: `org.gnome.shell.extensions.vram-ram-status` →
-    `org.gnome.shell.extensions.memory-monitor`
-  - Style classes, log prefix, notification app name, and JS class names
-    updated to match.
+## [0.1.0-alpha] — 2026-10-23
 
-## 0.1.0-alpha — 2026-10-22
-
-First public alpha release (previously tracked internally as 2.0.0). Not yet
-field-tested by end users.
+First public alpha release (previously tracked internally as 2.0.0).
+Field-verified on Fedora 44 / GNOME Shell 50.5.
 
 Complete rewrite of the baseline "Memory Monitor" extension.
 
@@ -39,6 +33,12 @@ Complete rewrite of the baseline "Memory Monitor" extension.
 
 ### Changed
 
+- Renamed the extension from "VRAM & RAM Status" to **Memory Monitor**.
+  - UUID: `vram-ram-status@local` → `memory-monitor@work_in_progress`
+  - GSettings schema: `org.gnome.shell.extensions.vram-ram-status` →
+    `org.gnome.shell.extensions.memory-monitor`
+  - Style classes, log prefix, notification app name, and JS class names
+    updated to match.
 - Default refresh interval changed from 2 s to 10 s.
 - Only GNOME Shell 50 is declared supported (was 49–53).
 
@@ -47,6 +47,12 @@ Complete rewrite of the baseline "Memory Monitor" extension.
 - Removed reliance on St `tooltip_text`, which was removed in GNOME Shell 50
   (St 18); alert/usage detail is now exposed through the menu and a textual
   panel marker instead.
+- Fixed the dropdown menu not opening on click: GNOME 50 `PopupMenu.open()`
+  returns early when the menu is empty (before emitting `open-state-changed`),
+  but the extension rendered content lazily from that signal. The menu now
+  renders eagerly on the first update.
+- Corrected the author/email shown in the About page and `original-author`
+  metadata (`lisanlbou@work_in_progress`).
 
 ### Hardened
 
