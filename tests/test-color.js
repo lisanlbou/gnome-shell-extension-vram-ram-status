@@ -1,7 +1,7 @@
 // tests/test-color.js — alert-level → style class and marker mapping.
 
-import { Level } from '../memory-monitor@local/lib/alerts.js';
-import { STYLE_CLASS, markerForLevel, resolveColorClass, BAR_FILL, resolveBarFill } from '../memory-monitor@local/lib/color.js';
+import { Level } from '../memory-monitor@work_in_progress/lib/alerts.js';
+import { STYLE_CLASS, markerForLevel, resolveColorClass, BAR_FILL, resolveBarFill } from '../memory-monitor@work_in_progress/lib/color.js';
 
 export function run(t) {
     const { eq, ok } = t;

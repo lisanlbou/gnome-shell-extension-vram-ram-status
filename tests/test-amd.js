@@ -1,6 +1,6 @@
 // tests/test-amd.js — AMD sysfs VRAM counter provider.
 
-import { parseVramCounters, readVram, PROVIDER } from '../memory-monitor@local/lib/gpu/providers/amd.js';
+import { parseVramCounters, readVram, PROVIDER } from '../memory-monitor@work_in_progress/lib/gpu/providers/amd.js';
 
 export function run(t) {
     const { eq } = t;

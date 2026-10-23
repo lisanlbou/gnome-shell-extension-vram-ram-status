@@ -29,14 +29,14 @@ See [`INSTALL.md`](INSTALL.md), or build and install the packaged bundle:
 
 ```sh
 ./build.sh
-gnome-extensions install memory-monitor@local.shell-extension.zip
+gnome-extensions install memory-monitor@work_in_progress.shell-extension.zip
 ```
 
 ## Documentation
 
-- [Extension README](memory-monitor@local/README.md) — full feature list, data
+- [Extension README](memory-monitor@work_in_progress/README.md) — full feature list, data
   semantics, vendor support, settings table and troubleshooting.
-- [Changelog](memory-monitor@local/CHANGELOG.md)
+- [Changelog](memory-monitor@work_in_progress/CHANGELOG.md)
 
 ## Testing
 
@@ -60,4 +60,4 @@ gjs -m tests/run-tests.js
 
 ## License
 
-GPL-2.0-or-later. See [LICENSE](memory-monitor@local/LICENSE).
+GPL-2.0-or-later. See [LICENSE](memory-monitor@work_in_progress/LICENSE).

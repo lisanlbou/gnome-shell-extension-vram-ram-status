@@ -283,7 +283,7 @@ export default class MemoryMonitorPreferences extends ExtensionPreferences {
         page.add(group);
 
         group.add(new Adw.ActionRow({ title: 'Version', subtitle: this.metadata['version-name'] }));
-        group.add(new Adw.ActionRow({ title: 'Author', subtitle: 'lisandro@local' }));
+        group.add(new Adw.ActionRow({ title: 'Author', subtitle: 'lisanlbou@work_in_progress' }));
         group.add(new Adw.ActionRow({
             title: 'GPU support',
             subtitle: 'AMD dedicated VRAM is supported natively. Intel and NVIDIA are capability-detected and reported as unavailable when no supported backend is present.',

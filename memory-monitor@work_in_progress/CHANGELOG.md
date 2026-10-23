@@ -5,7 +5,7 @@
 ### Changed
 
 - Renamed the extension from "VRAM & RAM Status" to **Memory Monitor**.
-  - UUID: `vram-ram-status@local` → `memory-monitor@local`
+  - UUID: `vram-ram-status@local` → `memory-monitor@work_in_progress`
   - GSettings schema: `org.gnome.shell.extensions.vram-ram-status` →
     `org.gnome.shell.extensions.memory-monitor`
   - Style classes, log prefix, notification app name, and JS class names

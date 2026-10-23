@@ -1,6 +1,6 @@
 // tests/test-alerts.js — threshold, hysteresis, cooldown state machine.
 
-import { Level, classifyPercent, evaluateAlert, maxLevel } from '../memory-monitor@local/lib/alerts.js';
+import { Level, classifyPercent, evaluateAlert, maxLevel } from '../memory-monitor@work_in_progress/lib/alerts.js';
 
 const BASE = { warning: 80, critical: 90, hysteresis: 5, cooldown: 300 };
 
