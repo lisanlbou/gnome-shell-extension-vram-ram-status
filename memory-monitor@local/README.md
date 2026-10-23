@@ -1,4 +1,4 @@
-# VRAM & RAM Status
+# Memory Monitor
 
 A GNOME Shell extension that shows system RAM and GPU memory usage directly in
 the top panel. It reads only `/proc/meminfo` and `/sys` — no network access, no
@@ -90,9 +90,9 @@ See `INSTALL.md`.
 
 ## Settings
 
-Persisted under `org.gnome.shell.extensions.vram-ram-status`. Display,
+Persisted under `org.gnome.shell.extensions.memory-monitor`. Display,
 Hardware, Monitoring, Alerts and About are all editable from Preferences
-(`gnome-extensions prefs vram-ram-status@local`).
+(`gnome-extensions prefs memory-monitor@local`).
 
 | Key | Type | Default | Purpose |
 | --- | --- | --- | --- |
@@ -126,8 +126,8 @@ live or nested GNOME Shell session.
 
 ## Troubleshooting
 
-- Watch the journal: `journalctl --user -f -o cat | grep -i vram-ram-status`.
-- Verify state: `gnome-extensions info vram-ram-status@local` (should show
+- Watch the journal: `journalctl --user -f -o cat | grep -i memory-monitor`.
+- Verify state: `gnome-extensions info memory-monitor@local` (should show
   `State: ACTIVE`).
 - A GPU shows *unavailable*: confirm the counters exist under
   `/sys/class/drm/card*/device/` (AMD) or that an NVIDIA helper is configured.

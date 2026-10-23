@@ -14,7 +14,7 @@ export function notify(title, body) {
     try {
         const connection = Gio.DBus.session;
         const parameters = new GLib.Variant('(susssasa{sv}i)', [
-            'vram-ram-status', // app_name
+            'memory-monitor', // app_name
             0,                 // replaces_id
             '',                // app_icon
             title,             // summary

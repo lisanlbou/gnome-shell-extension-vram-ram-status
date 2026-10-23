@@ -10,7 +10,7 @@ import {
     MemoryClass,
     Status,
     Kind,
-} from '../vram-ram-status@local/lib/model.js';
+} from '../memory-monitor@local/lib/model.js';
 
 export function run(t) {
     const { eq } = t;

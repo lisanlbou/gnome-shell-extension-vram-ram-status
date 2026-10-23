@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-EXT=vram-ram-status@local
+EXT=memory-monitor@local
 
 echo "==> Running unit tests"
 gjs -m tests/run-tests.js

@@ -15,7 +15,7 @@ import {
     normalizeRefreshInterval,
     normalizeColorTarget,
     normalizeThresholdPair,
-} from '../vram-ram-status@local/lib/settings.js';
+} from '../memory-monitor@local/lib/settings.js';
 
 export function run(t) {
     const { eq } = t;

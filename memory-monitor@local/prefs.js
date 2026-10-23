@@ -59,7 +59,7 @@ const REFRESH_LABELS = {
     60: '60 seconds',
 };
 
-export default class VramRamPreferences extends ExtensionPreferences {
+export default class MemoryMonitorPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         this._settings = this.getSettings();
         this._buildDisplayPage(window);
@@ -277,7 +277,7 @@ export default class VramRamPreferences extends ExtensionPreferences {
         window.add(page);
 
         const group = new Adw.PreferencesGroup({
-            title: 'VRAM & RAM Status',
+            title: 'Memory Monitor',
             description: 'Displays system RAM and GPU memory from /proc/meminfo and sysfs. No network access, no root required.',
         });
         page.add(group);

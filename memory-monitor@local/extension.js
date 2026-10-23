@@ -43,7 +43,7 @@ const REFRESH_KEYS = [
     'menu-show-vram',
 ];
 
-export default class VramRamExtension extends Extension {
+export default class MemoryMonitorExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
 
@@ -113,8 +113,8 @@ export default class VramRamExtension extends Extension {
                 continue;
             const label = kind === 'ram' ? 'RAM' : 'VRAM';
             log(failed
-                ? `vram-ram-status: ${label} usage unavailable (${snapshot[kind].errorCode ?? 'unknown'})`
-                : `vram-ram-status: ${label} reading recovered`);
+                ? `memory-monitor: ${label} usage unavailable (${snapshot[kind].errorCode ?? 'unknown'})`
+                : `memory-monitor: ${label} reading recovered`);
             this[`_${kind}Failed`] = failed;
         }
     }

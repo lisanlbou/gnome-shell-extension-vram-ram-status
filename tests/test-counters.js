@@ -1,6 +1,6 @@
 // tests/test-counters.js — strict used/total counter parsing.
 
-import { parseByteCounters } from '../vram-ram-status@local/lib/gpu/counters.js';
+import { parseByteCounters } from '../memory-monitor@local/lib/gpu/counters.js';
 
 export function run(t) {
     const { eq } = t;

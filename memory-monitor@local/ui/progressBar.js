@@ -16,7 +16,7 @@ const BAR_HEIGHT = 6;
  * null to use the theme's foreground color for the neutral state.
  */
 export const ProgressBar = GObject.registerClass({
-    GTypeName: 'VramRamProgressBar',
+    GTypeName: 'MemoryMonitorProgressBar',
 }, class ProgressBar extends St.DrawingArea {
     _init(params = {}) {
         const { fraction = 0, fill = null, ...rest } = params;
