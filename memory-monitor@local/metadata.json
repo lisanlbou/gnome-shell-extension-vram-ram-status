@@ -2,7 +2,7 @@
   "uuid": "memory-monitor@local",
   "name": "Memory Monitor",
   "description": "Displays VRAM and System RAM usage from sysfs and /proc/meminfo",
-  "url": "https://github.com/lisanlbou/gnome-shell-extension-memory-monitor",
+  "url": "https://github.com/lisanlbou/gnome-shell-extension-vram-ram-status",
   "shell-version": [ "50" ],
   "settings-schema": "org.gnome.shell.extensions.memory-monitor",
   "version-name": "0.1.0-alpha",
