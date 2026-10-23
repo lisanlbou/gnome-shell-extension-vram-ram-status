@@ -42,7 +42,9 @@ export class Menu {
     /**
      * Store the latest snapshot/options and rebuild the menu only while it is
      * open. When closed, mark dirty and rebuild on the next open instead of
-     * tearing down and recreating every popup item on every poll.
+     * tearing down and recreating every popup item on every poll — except that
+     * the first update populates the menu eagerly, because an empty PopupMenu
+     * refuses to open (see open()/isEmpty() in GNOME's popupMenu.js).
      */
     update(snapshot, {
         ramLevel = Level.NONE,
@@ -63,6 +65,14 @@ export class Menu {
         };
 
         if (this._open) {
+            this._render(this._lastState);
+            this._dirty = false;
+        } else if (this._button.menu.isEmpty()) {
+            // GNOME 50's PopupMenu.open() returns early when the menu has no
+            // visible items and never emits 'open-state-changed' in that case.
+            // Since the first render was deferred to that signal, an empty menu
+            // could never open at all. Populate it eagerly on the first update
+            // so a later click can actually open it.
             this._render(this._lastState);
             this._dirty = false;
         } else {
