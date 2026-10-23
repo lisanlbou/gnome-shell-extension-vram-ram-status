@@ -37,6 +37,7 @@ gnome-extensions install memory-monitor@work_in_progress.shell-extension.zip
 - [Extension README](memory-monitor@work_in_progress/README.md) — full feature list, data
   semantics, vendor support, settings table and troubleshooting.
 - [Changelog](memory-monitor@work_in_progress/CHANGELOG.md)
+- [Release notes](RELEASE-NOTES.md)
 
 ## Testing
 
