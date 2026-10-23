@@ -4,8 +4,8 @@
 // propagating to GLib, that single-stage failures do not take down the whole
 // snapshot, and that diagnostics are logged transitionally (once per scope).
 
-import { Monitor } from '../memory-monitor@local/lib/monitor.js';
-import { Status } from '../memory-monitor@local/lib/model.js';
+import { Monitor } from '../memory-monitor@work_in_progress/lib/monitor.js';
+import { Status } from '../memory-monitor@work_in_progress/lib/model.js';
 import { amdIo, MEMINFO } from './fixtures.js';
 
 export function run(t) {

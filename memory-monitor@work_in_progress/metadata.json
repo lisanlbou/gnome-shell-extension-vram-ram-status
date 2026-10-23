@@ -1,5 +1,5 @@
 {
-  "uuid": "memory-monitor@local",
+  "uuid": "memory-monitor@work_in_progress",
   "name": "Memory Monitor",
   "description": "Displays VRAM and System RAM usage from sysfs and /proc/meminfo",
   "url": "https://github.com/lisanlbou/gnome-shell-extension-vram-ram-status",

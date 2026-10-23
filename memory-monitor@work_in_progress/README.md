@@ -92,7 +92,7 @@ See `INSTALL.md`.
 
 Persisted under `org.gnome.shell.extensions.memory-monitor`. Display,
 Hardware, Monitoring, Alerts and About are all editable from Preferences
-(`gnome-extensions prefs memory-monitor@local`).
+(`gnome-extensions prefs memory-monitor@work_in_progress`).
 
 | Key | Type | Default | Purpose |
 | --- | --- | --- | --- |
@@ -127,7 +127,7 @@ live or nested GNOME Shell session.
 ## Troubleshooting
 
 - Watch the journal: `journalctl --user -f -o cat | grep -i memory-monitor`.
-- Verify state: `gnome-extensions info memory-monitor@local` (should show
+- Verify state: `gnome-extensions info memory-monitor@work_in_progress` (should show
   `State: ACTIVE`).
 - A GPU shows *unavailable*: confirm the counters exist under
   `/sys/class/drm/card*/device/` (AMD) or that an NVIDIA helper is configured.

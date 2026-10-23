@@ -1,6 +1,6 @@
 // tests/test-selection.js — per-GPU selection resolution.
 
-import { resolveSelection } from '../memory-monitor@local/lib/gpu/selection.js';
+import { resolveSelection } from '../memory-monitor@work_in_progress/lib/gpu/selection.js';
 
 const DEVICES = [
     { stableId: 'pci-0000:00:02.0', vendor: 'intel' },

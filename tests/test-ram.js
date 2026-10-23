@@ -2,7 +2,7 @@
 
 import GLib from 'gi://GLib';
 
-import { parseMeminfo } from '../memory-monitor@local/lib/memory/ram.js';
+import { parseMeminfo } from '../memory-monitor@work_in_progress/lib/memory/ram.js';
 
 function readFixture(name) {
     const here = import.meta.url.replace(/^file:\/\//, '');
