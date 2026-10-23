@@ -1,4 +1,4 @@
-/* VRAM & RAM Status — scoped, theme-compatible state styles.
+/* Memory Monitor — scoped, theme-compatible state styles.
  *
  * Warning/critical colors match the palette used by the GNOME Shell 50 theme
  * itself (#cd9309 for warnings, #c01c28 for destructive/error). Color is never
@@ -6,31 +6,31 @@
  * information as text, and alerts emit notifications.
  */
 
-.vram-ram-normal {
+.memory-monitor-normal {
   color: #26a269;
 }
 
-.vram-ram-warning {
+.memory-monitor-warning {
   color: #cd9309;
 }
 
-.vram-ram-critical {
+.memory-monitor-critical {
   color: #c01c28;
 }
 
 /* Horizontal layout for the per-metric sub-actors (icon, value, percentage)
  * and the separator between metrics. */
-.vram-ram-indicator {
+.memory-monitor-indicator {
   spacing: 4px;
 }
 
 /* Each metric is wrapped in a sub-box so a single style class can color the
  * whole metric (marker, icon, value and percentage) or an individual part. */
-.vram-ram-metric {
+.memory-monitor-metric {
   spacing: 4px;
 }
 
 /* Dropdown-menu progress bars are drawn with Cairo (ui/progressBar.js). The
  * class is a theming hook; the bar supplies its own height and fill color. */
-.vram-ram-bar {
+.memory-monitor-bar {
 }

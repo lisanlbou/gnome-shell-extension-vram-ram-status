@@ -5,7 +5,7 @@
 // main loop. The fake scheduler mirrors GLib's contract: `remove(id)` cancels
 // a source, and a removed source never fires again.
 
-import { Monitor } from '../vram-ram-status@local/lib/monitor.js';
+import { Monitor } from '../memory-monitor@local/lib/monitor.js';
 import { amdIo, MEMINFO } from './fixtures.js';
 
 /**

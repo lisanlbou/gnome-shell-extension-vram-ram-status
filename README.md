@@ -1,4 +1,4 @@
-# VRAM & RAM Status
+# Memory Monitor
 
 A GNOME Shell extension that shows system RAM and GPU (VRAM) memory usage
 directly in the top panel. It reads only `/proc/meminfo` and `/sys` — no network
@@ -29,14 +29,14 @@ See [`INSTALL.md`](INSTALL.md), or build and install the packaged bundle:
 
 ```sh
 ./build.sh
-gnome-extensions install vram-ram-status@local.shell-extension.zip
+gnome-extensions install memory-monitor@local.shell-extension.zip
 ```
 
 ## Documentation
 
-- [Extension README](vram-ram-status@local/README.md) — full feature list, data
+- [Extension README](memory-monitor@local/README.md) — full feature list, data
   semantics, vendor support, settings table and troubleshooting.
-- [Changelog](vram-ram-status@local/CHANGELOG.md)
+- [Changelog](memory-monitor@local/CHANGELOG.md)
 
 ## Testing
 
@@ -60,4 +60,4 @@ gjs -m tests/run-tests.js
 
 ## License
 
-GPL-2.0-or-later. See [LICENSE](vram-ram-status@local/LICENSE).
+GPL-2.0-or-later. See [LICENSE](memory-monitor@local/LICENSE).

@@ -9,9 +9,9 @@ import { Level } from './alerts.js';
 
 /** Style class per alert level. "normal" is the optional green state. */
 export const STYLE_CLASS = Object.freeze({
-    [Level.NONE]: 'vram-ram-normal',
-    [Level.WARNING]: 'vram-ram-warning',
-    [Level.CRITICAL]: 'vram-ram-critical',
+    [Level.NONE]: 'memory-monitor-normal',
+    [Level.WARNING]: 'memory-monitor-warning',
+    [Level.CRITICAL]: 'memory-monitor-critical',
 });
 
 /**

@@ -1,7 +1,7 @@
 // tests/test-format.js — display formatting and units.
 
-import { formatGiB, formatMetric, formatMetricParts, formatLabel, metricUnit } from '../vram-ram-status@local/lib/format.js';
-import { Reading, Status, Kind } from '../vram-ram-status@local/lib/model.js';
+import { formatGiB, formatMetric, formatMetricParts, formatLabel, metricUnit } from '../memory-monitor@local/lib/format.js';
+import { Reading, Status, Kind } from '../memory-monitor@local/lib/model.js';
 
 const GIB = 1073741824;
 

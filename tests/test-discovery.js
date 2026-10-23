@@ -7,7 +7,7 @@ import {
     parseUevent,
     buildDevice,
     discover,
-} from '../vram-ram-status@local/lib/gpu/discovery.js';
+} from '../memory-monitor@local/lib/gpu/discovery.js';
 
 export function run(t) {
     const { eq } = t;

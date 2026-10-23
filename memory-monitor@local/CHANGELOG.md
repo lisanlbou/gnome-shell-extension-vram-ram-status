@@ -1,11 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Renamed the extension from "VRAM & RAM Status" to **Memory Monitor**.
+  - UUID: `vram-ram-status@local` → `memory-monitor@local`
+  - GSettings schema: `org.gnome.shell.extensions.vram-ram-status` →
+    `org.gnome.shell.extensions.memory-monitor`
+  - Style classes, log prefix, notification app name, and JS class names
+    updated to match.
+
 ## 0.1.0-alpha — 2026-10-22
 
 First public alpha release (previously tracked internally as 2.0.0). Not yet
 field-tested by end users.
 
-Complete rewrite of the baseline "VRAM & RAM Status" extension.
+Complete rewrite of the baseline "Memory Monitor" extension.
 
 ### Added
 

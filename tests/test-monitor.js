@@ -3,8 +3,8 @@
 // The Monitor only depends on GLib (available in GJS) plus pure lib/ modules,
 // so its collect() pipeline can be exercised headless with a fake filesystem.
 
-import { Monitor } from '../vram-ram-status@local/lib/monitor.js';
-import { MemoryClass, Status } from '../vram-ram-status@local/lib/model.js';
+import { Monitor } from '../memory-monitor@local/lib/monitor.js';
+import { MemoryClass, Status } from '../memory-monitor@local/lib/model.js';
 import { amdIo, MEMINFO } from './fixtures.js';
 
 function dualIo() {

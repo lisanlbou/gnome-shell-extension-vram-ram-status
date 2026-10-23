@@ -21,7 +21,7 @@ import * as Color from '../lib/color.js';
 import { normalizeColorTarget, normalizePanelBox, normalizePanelPosition } from '../lib/settings.js';
 import { Menu } from './menu.js';
 
-const STATUS_AREA_ROLE = 'vram-ram-indicator';
+const STATUS_AREA_ROLE = 'memory-monitor-indicator';
 
 /**
  * Icon and accessible name for each metric kind ('ram' | 'vram').
@@ -36,9 +36,9 @@ const METRIC_ICONS = Object.freeze({
 export class Indicator {
     constructor(settings, openPreferences) {
         this._settings = settings;
-        this._button = new PanelMenu.Button(0.0, 'VRAM & RAM Status', false);
+        this._button = new PanelMenu.Button(0.0, 'Memory Monitor', false);
         this._box = new St.BoxLayout({
-            style_class: 'vram-ram-indicator',
+            style_class: 'memory-monitor-indicator',
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._button.add_child(this._box);
@@ -169,7 +169,7 @@ export class Indicator {
 
     _createMetric(box, { kind, level }, parts, options, color) {
         const metricBox = new St.BoxLayout({
-            style_class: 'vram-ram-metric',
+            style_class: 'memory-monitor-metric',
             y_align: Clutter.ActorAlign.CENTER,
         });
 

@@ -164,7 +164,7 @@ export class Monitor {
             return;
         this._failures[scope] = true;
         const detail = (error && error.message) ? error.message : String(error);
-        this._logger(`vram-ram-status: ${scope} failed: ${detail}`);
+        this._logger(`memory-monitor: ${scope} failed: ${detail}`);
     }
 
     /** Log recovery from a previously-failed scope exactly once. */
@@ -172,7 +172,7 @@ export class Monitor {
         if (!this._failures[scope])
             return;
         delete this._failures[scope];
-        this._logger(`vram-ram-status: ${scope} recovered`);
+        this._logger(`memory-monitor: ${scope} recovered`);
     }
 
     /**

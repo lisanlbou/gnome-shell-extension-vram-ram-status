@@ -1,9 +1,9 @@
 // tests/test-providers.js — AMD/Intel/NVIDIA provider read() contract.
 
-import * as Amd from '../vram-ram-status@local/lib/gpu/providers/amd.js';
-import * as Intel from '../vram-ram-status@local/lib/gpu/providers/intel.js';
-import * as Nvidia from '../vram-ram-status@local/lib/gpu/providers/nvidia.js';
-import { MemoryClass, Status } from '../vram-ram-status@local/lib/model.js';
+import * as Amd from '../memory-monitor@local/lib/gpu/providers/amd.js';
+import * as Intel from '../memory-monitor@local/lib/gpu/providers/intel.js';
+import * as Nvidia from '../memory-monitor@local/lib/gpu/providers/nvidia.js';
+import { MemoryClass, Status } from '../memory-monitor@local/lib/model.js';
 
 function io(files) {
     return { readText: path => (path in files ? files[path] : null), listDir: () => [] };
